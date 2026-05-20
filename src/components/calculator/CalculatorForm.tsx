@@ -33,9 +33,13 @@ export default function CalculatorForm({ pricing }: CalculatorFormProps) {
     setInput(defaultInput(pricing))
   }, [pricing])
 
+  // Recalculate live on every input change
+  useEffect(() => {
+    setQuote(calculateQuote(input, pricing))
+  }, [input, pricing])
+
   const set = <K extends keyof QuoteInput>(key: K, value: QuoteInput[K]) => {
     setInput(prev => ({ ...prev, [key]: value }))
-    setQuote(null)
   }
 
   const handlePrintingChange = (field: 'printColours' | 'printAreaId', value: number | string) => {
@@ -47,14 +51,8 @@ export default function CalculatorForm({ pricing }: CalculatorFormProps) {
     set('material', input.material === m ? '' : m)
   }
 
-  const handleCalculate = () => {
-    const result = calculateQuote(input, pricing)
-    setQuote(result)
-  }
-
   const handleReset = () => {
     setInput(defaultInput(pricing))
-    setQuote(null)
   }
 
   return (
@@ -175,11 +173,8 @@ export default function CalculatorForm({ pricing }: CalculatorFormProps) {
         </div>
       </Card>
 
-      <div className="flex gap-3">
-        <Button onClick={handleCalculate} size="lg" className="flex-1">
-          Calculate Quote
-        </Button>
-        <Button onClick={handleReset} variant="secondary" size="lg">
+      <div className="flex justify-end">
+        <Button onClick={handleReset} variant="secondary" size="md">
           Reset
         </Button>
       </div>
