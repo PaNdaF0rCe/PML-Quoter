@@ -26,7 +26,8 @@ export function PricingProvider({ children }: { children: ReactNode }) {
       setPricing(p)
     } catch (e) {
       console.error('Pricing load failed, using defaults', e)
-      setError('Could not load pricing from server. Using defaults.')
+      const detail = e instanceof Error ? e.message : String(e)
+      setError(`Could not load pricing from server. Using defaults. (${detail})`)
       setPricing(defaultPricing)
     } finally {
       setLoading(false)
