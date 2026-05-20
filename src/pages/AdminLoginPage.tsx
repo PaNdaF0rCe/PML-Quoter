@@ -93,6 +93,11 @@ export default function AdminLoginPage() {
             ← Back to Calculator
           </Link>
         </p>
+
+        <div className="mt-6 p-3 bg-gray-100 rounded-lg text-xs text-gray-500 font-mono break-all">
+          <p>project: {import.meta.env.VITE_FIREBASE_PROJECT_ID || '⚠ NOT SET'}</p>
+          <p>auth: {import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '⚠ NOT SET'}</p>
+        </div>
       </div>
     </div>
   )
