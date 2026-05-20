@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { usePricing } from '../context/PricingContext'
 import { useAuth } from '../context/AuthContext'
 import CalculatorForm from '../components/calculator/CalculatorForm'
+import logo from '../assets/logo.webp'
 
 export default function CalculatorPage() {
   const { pricing, loading, error } = usePricing()
@@ -9,24 +10,21 @@ export default function CalculatorPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-blue-800 text-white shadow-lg">
-        <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">Pack Me Lanka</h1>
-            <p className="text-blue-200 text-sm">Quotation Calculator</p>
-          </div>
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+          <img src={logo} alt="Pack Me Lanka" className="h-12 w-auto" />
           <div className="flex items-center gap-3">
             {user ? (
               <Link
                 to="/admin"
-                className="text-xs bg-white text-blue-800 font-semibold px-3 py-1.5 rounded-lg hover:bg-blue-50 transition-colors"
+                className="text-xs bg-red-700 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-red-800 transition-colors"
               >
                 Admin Dashboard
               </Link>
             ) : (
               <Link
                 to="/admin/login"
-                className="text-xs text-blue-200 hover:text-white transition-colors"
+                className="text-xs text-gray-400 hover:text-gray-700 transition-colors"
               >
                 Admin
               </Link>
@@ -37,14 +35,14 @@ export default function CalculatorPage() {
 
       <main className="max-w-3xl mx-auto px-4 py-8">
         {error && (
-          <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-sm text-amber-800">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
             {error}
           </div>
         )}
 
         {loading ? (
           <div className="flex flex-col items-center justify-center py-24 gap-4">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-700" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-red-700" />
             <p className="text-sm text-gray-500">Loading pricing data…</p>
           </div>
         ) : (

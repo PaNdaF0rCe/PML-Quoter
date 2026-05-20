@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import Label from '../components/ui/Label'
+import logo from '../assets/logo.webp'
 
 export default function AdminLoginPage() {
   const { login, user } = useAuth()
@@ -44,9 +45,9 @@ export default function AdminLoginPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       <div className="w-full max-w-sm">
-        <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Pack Me Lanka</h1>
-          <p className="text-gray-500 text-sm mt-1">Admin Sign In</p>
+        <div className="flex flex-col items-center mb-8 gap-3">
+          <img src={logo} alt="Pack Me Lanka" className="h-16 w-auto" />
+          <p className="text-gray-500 text-sm">Admin Sign In</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -89,15 +90,10 @@ export default function AdminLoginPage() {
         </div>
 
         <p className="text-center mt-6">
-          <Link to="/" className="text-sm text-blue-700 hover:underline">
+          <Link to="/" className="text-sm text-red-700 hover:underline">
             ← Back to Calculator
           </Link>
         </p>
-
-        <div className="mt-6 p-3 bg-gray-100 rounded-lg text-xs text-gray-500 font-mono break-all">
-          <p>project: {import.meta.env.VITE_FIREBASE_PROJECT_ID || '⚠ NOT SET'}</p>
-          <p>auth: {import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || '⚠ NOT SET'}</p>
-        </div>
       </div>
     </div>
   )

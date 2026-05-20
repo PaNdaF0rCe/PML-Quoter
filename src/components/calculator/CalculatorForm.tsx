@@ -113,8 +113,8 @@ export default function CalculatorForm({ pricing }: CalculatorFormProps) {
               onClick={() => handleMaterial(key)}
               className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
                 input.material === key
-                  ? 'bg-blue-700 border-blue-700 text-white'
-                  : 'bg-white border-gray-300 text-gray-700 hover:border-blue-400'
+                  ? 'bg-red-700 border-red-700 text-white'
+                  : 'bg-white border-gray-300 text-gray-700 hover:border-red-400'
               }`}
             >
               {label}
@@ -130,7 +130,7 @@ export default function CalculatorForm({ pricing }: CalculatorFormProps) {
             id="printing"
             checked={input.printing}
             onChange={e => set('printing', e.target.checked)}
-            className="h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-gray-300 text-red-700 focus:ring-red-500"
           />
           <label htmlFor="printing" className="text-sm font-medium text-gray-700 cursor-pointer">
             Include Printing
@@ -162,7 +162,7 @@ export default function CalculatorForm({ pricing }: CalculatorFormProps) {
                 id={key}
                 checked={input[key]}
                 onChange={e => set(key, e.target.checked)}
-                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-blue-700 focus:ring-blue-500"
+                className="mt-0.5 h-4 w-4 rounded border-gray-300 text-red-700 focus:ring-red-500"
               />
               <label htmlFor={key} className="cursor-pointer">
                 <span className="block text-sm font-medium text-gray-700">{label}</span>

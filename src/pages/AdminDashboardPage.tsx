@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import logo from '../assets/logo.webp'
 import { usePricing } from '../context/PricingContext'
 import type { PricingConfig } from '../lib/pricing/types'
 import Button from '../components/ui/Button'
@@ -44,14 +45,17 @@ export default function AdminDashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="bg-blue-800 text-white shadow-lg">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">Pack Me Lanka — Admin</h1>
-            <p className="text-blue-200 text-xs mt-0.5">{user?.email}</p>
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <img src={logo} alt="Pack Me Lanka" className="h-12 w-auto" />
+            <div>
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Admin Dashboard</p>
+              <p className="text-xs text-gray-400">{user?.email}</p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <Link to="/" className="text-xs text-blue-200 hover:text-white transition-colors">
+            <Link to="/" className="text-xs text-gray-500 hover:text-gray-800 transition-colors">
               Calculator
             </Link>
             <Button variant="secondary" size="sm" onClick={() => logout()}>
@@ -77,7 +81,7 @@ export default function AdminDashboardPage() {
                 onClick={() => setActiveSection(s.key)}
                 className={`w-full text-left px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                   activeSection === s.key
-                    ? 'bg-blue-700 text-white'
+                    ? 'bg-red-700 text-white'
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >

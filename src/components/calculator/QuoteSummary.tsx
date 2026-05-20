@@ -23,8 +23,8 @@ export default function QuoteSummary({ quote }: QuoteSummaryProps) {
   ]
 
   return (
-    <Card className="border-blue-200 bg-gradient-to-br from-blue-50 to-white">
-      <h2 className="text-lg font-bold text-blue-900 mb-4">Quote Summary</h2>
+    <Card className="border-red-200 bg-gradient-to-br from-red-50 to-white">
+      <h2 className="text-lg font-bold text-gray-900 mb-4">Quote Summary</h2>
 
       <div className="space-y-2">
         {rows.map((row, i) => (
@@ -39,10 +39,10 @@ export default function QuoteSummary({ quote }: QuoteSummaryProps) {
         ))}
       </div>
 
-      <div className="mt-4 pt-4 border-t-2 border-blue-300 space-y-2">
+      <div className="mt-4 pt-4 border-t-2 border-red-200 space-y-2">
         <div className="flex items-center justify-between">
-          <span className="text-base font-bold text-blue-900">Estimated Total</span>
-          <span className="text-xl font-bold text-blue-700">LKR {fmt(quote.total)}</span>
+          <span className="text-base font-bold text-gray-900">Estimated Total</span>
+          <span className="text-xl font-bold text-red-700">LKR {fmt(quote.total)}</span>
         </div>
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">Per Unit Price</span>
