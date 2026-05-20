@@ -1,13 +1,6 @@
 import type { PricingConfig } from '../../lib/pricing/types'
 
 export const defaultPricing: PricingConfig = {
-  productTypes: [
-    { id: 'paper-bag', label: 'Paper Bag', basePrice: 0.02 },
-    { id: 'box', label: 'Box', basePrice: 0.035 },
-    { id: 'sleeve', label: 'Sleeve', basePrice: 0.015 },
-    { id: 'pouch', label: 'Pouch', basePrice: 0.025 },
-    { id: 'wrapper', label: 'Wrapper', basePrice: 0.01 },
-  ],
   reelSizes: [
     { id: 'small', label: 'Small (100mm)', price: 0.005 },
     { id: 'medium', label: 'Medium (200mm)', price: 0.008 },

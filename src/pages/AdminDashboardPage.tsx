@@ -8,14 +8,13 @@ import Card from '../components/ui/Card'
 import Label from '../components/ui/Label'
 import Input from '../components/ui/Input'
 import SeedButton from '../components/admin/SeedButton'
-import ProductTypesEditor from '../components/admin/ProductTypesEditor'
 import ReelSizesEditor from '../components/admin/ReelSizesEditor'
 import QuantityTiersEditor from '../components/admin/QuantityTiersEditor'
 import PrintingRatesEditor from '../components/admin/PrintingRatesEditor'
 import MaterialRatesEditor from '../components/admin/MaterialRatesEditor'
 import AddOnRatesEditor from '../components/admin/AddOnRatesEditor'
 
-type Section = 'products' | 'reels' | 'tiers' | 'printing' | 'materials' | 'addons' | 'labour'
+type Section = 'reels' | 'tiers' | 'printing' | 'materials' | 'addons' | 'labour'
 
 export default function AdminDashboardPage() {
   const { logout, user } = useAuth()
@@ -23,7 +22,7 @@ export default function AdminDashboardPage() {
   const [local, setLocal] = useState<PricingConfig>(pricing)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const [activeSection, setActiveSection] = useState<Section>('products')
+  const [activeSection, setActiveSection] = useState<Section>('reels')
 
   const handleSave = async () => {
     setSaving(true)
@@ -35,7 +34,6 @@ export default function AdminDashboardPage() {
   }
 
   const sections: { key: Section; label: string }[] = [
-    { key: 'products', label: 'Product Types' },
     { key: 'reels', label: 'Reel Sizes' },
     { key: 'tiers', label: 'Quantity Tiers' },
     { key: 'printing', label: 'Printing Rates' },
@@ -90,15 +88,6 @@ export default function AdminDashboardPage() {
 
           {/* Section content */}
           <div className="flex-1">
-            {activeSection === 'products' && (
-              <Card title="Product Types">
-                <ProductTypesEditor
-                  items={local.productTypes}
-                  onChange={items => setLocal(p => ({ ...p, productTypes: items }))}
-                />
-              </Card>
-            )}
-
             {activeSection === 'reels' && (
               <Card title="Reel Sizes">
                 <ReelSizesEditor

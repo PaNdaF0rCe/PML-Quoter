@@ -10,7 +10,6 @@ import PrintingConfig from './PrintingConfig'
 import QuoteSummary from './QuoteSummary'
 
 const defaultInput = (pricing: PricingConfig): QuoteInput => ({
-  productTypeId: pricing.productTypes[0]?.id ?? '',
   reelSizeId: pricing.reelSizes[0]?.id ?? '',
   requestedQty: 2000,
   printing: false,
@@ -60,21 +59,8 @@ export default function CalculatorForm({ pricing }: CalculatorFormProps) {
 
   return (
     <div className="space-y-6">
-      <Card title="Product Details">
+      <Card title="Order Details">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor="productType">Product / Type</Label>
-            <Select
-              id="productType"
-              value={input.productTypeId}
-              onChange={e => set('productTypeId', e.target.value)}
-            >
-              {pricing.productTypes.map(p => (
-                <option key={p.id} value={p.id}>{p.label}</option>
-              ))}
-            </Select>
-          </div>
-
           <div>
             <Label htmlFor="reelSize">Reel Size</Label>
             <Select

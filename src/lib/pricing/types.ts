@@ -1,9 +1,3 @@
-export interface ProductTypePrice {
-  id: string
-  label: string
-  basePrice: number
-}
-
 export interface ReelSizePrice {
   id: string
   label: string
@@ -40,7 +34,6 @@ export interface AddOnRates {
 }
 
 export interface PricingConfig {
-  productTypes: ProductTypePrice[]
   reelSizes: ReelSizePrice[]
   quantityTiers: QuantityTier[]
   printColourRates: PrintColourRate[]
@@ -53,7 +46,6 @@ export interface PricingConfig {
 export type MaterialOption = 'twoply' | 'threeply' | 'lamination' | ''
 
 export interface QuoteInput {
-  productTypeId: string
   reelSizeId: string
   requestedQty: number
   printing: boolean

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { ProductTypePrice } from '../../lib/pricing/types'
+interface ProductTypePrice { id: string; label: string; basePrice: number }
 import Input from '../ui/Input'
 import Button from '../ui/Button'
 import Label from '../ui/Label'

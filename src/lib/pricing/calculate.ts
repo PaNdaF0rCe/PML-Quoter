@@ -7,15 +7,13 @@ export function getCostingTier(requestedQty: number, tiers: { qty: number }[]): 
 }
 
 export function calculateQuote(input: QuoteInput, pricing: PricingConfig): QuoteBreakdown | null {
-  const product = pricing.productTypes.find(p => p.id === input.productTypeId)
   const reel = pricing.reelSizes.find(r => r.id === input.reelSizeId)
 
-  if (!product || !reel || input.requestedQty <= 0) return null
+  if (!reel || input.requestedQty <= 0) return null
 
   const costingQty = getCostingTier(input.requestedQty, pricing.quantityTiers)
 
-  // Base price is product + reel, scaled to costing quantity
-  const basePrice = (product.basePrice + reel.price) * costingQty
+  const basePrice = reel.price * costingQty
 
   // Printing cost
   let printingCost = 0
