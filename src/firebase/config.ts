@@ -2,15 +2,13 @@ import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 
-const clean = (s: string) => s.charCodeAt(0) === 0xfeff ? s.slice(1) : s
-
 const firebaseConfig = {
-  apiKey: clean(import.meta.env.VITE_FIREBASE_API_KEY ?? ''),
-  authDomain: clean(import.meta.env.VITE_FIREBASE_AUTH_DOMAIN ?? ''),
-  projectId: clean(import.meta.env.VITE_FIREBASE_PROJECT_ID ?? ''),
-  storageBucket: clean(import.meta.env.VITE_FIREBASE_STORAGE_BUCKET ?? ''),
-  messagingSenderId: clean(import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID ?? ''),
-  appId: clean(import.meta.env.VITE_FIREBASE_APP_ID ?? ''),
+  apiKey: 'AIzaSyCCk45YucPZQ-f5nmbUe-GP3rY1GwmSAnk',
+  authDomain: 'pml-quoter.firebaseapp.com',
+  projectId: 'pml-quoter',
+  storageBucket: 'pml-quoter.firebasestorage.app',
+  messagingSenderId: '375158026666',
+  appId: '1:375158026666:web:e68168815c216fbc797bd3',
 }
 
 const app = initializeApp(firebaseConfig)
