@@ -25,8 +25,17 @@ export default function AdminLoginPage() {
     try {
       await login(email, password)
       navigate('/admin', { replace: true })
-    } catch {
-      setError('Invalid email or password.')
+    } catch (err: unknown) {
+      const code = (err as { code?: string }).code ?? 'unknown'
+      if (code === 'auth/unauthorized-domain') {
+        setError('This domain is not authorized in Firebase. Add it under Authentication → Settings → Authorized domains.')
+      } else if (code === 'auth/operation-not-allowed') {
+        setError('Email/Password sign-in is not enabled in Firebase. Enable it under Authentication → Sign-in method.')
+      } else if (code === 'auth/user-not-found' || code === 'auth/wrong-password' || code === 'auth/invalid-credential') {
+        setError('Invalid email or password. Make sure the user exists in Firebase Authentication.')
+      } else {
+        setError(`Sign-in failed: ${code}`)
+      }
     } finally {
       setLoading(false)
     }
