@@ -14,12 +14,18 @@ export default function CalculatorPage() {
         <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
           <img src={logo} alt="Pack Me Lanka" className="h-12 w-auto" />
           <div className="flex items-center gap-3">
+            <Link
+              to="/analysis"
+              className="text-xs text-gray-500 hover:text-gray-800 font-medium transition-colors"
+            >
+              Layout Analysis
+            </Link>
             {user ? (
               <Link
                 to="/admin"
                 className="text-xs bg-red-700 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-red-800 transition-colors"
               >
-                Admin Dashboard
+                Admin
               </Link>
             ) : (
               <Link

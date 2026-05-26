@@ -4,6 +4,7 @@ import { PricingProvider } from './context/PricingContext'
 import CalculatorPage from './pages/CalculatorPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
+import SampleAnalysisPage from './pages/SampleAnalysisPage'
 import ProtectedRoute from './components/ui/ProtectedRoute'
 
 export default function App() {
@@ -13,6 +14,7 @@ export default function App() {
         <PricingProvider>
           <Routes>
             <Route path="/" element={<CalculatorPage />} />
+            <Route path="/analysis" element={<SampleAnalysisPage />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route
               path="/admin"

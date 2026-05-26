@@ -11,8 +11,8 @@ interface PrintingConfigProps {
 
 export default function PrintingConfig({ colours, printAreaId, pricing, onChange }: PrintingConfigProps) {
   return (
-    <div className="mt-4 ml-6 p-4 bg-blue-50 border border-blue-200 rounded-lg space-y-4">
-      <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Printing Configuration</p>
+    <div className="mt-4 ml-6 p-4 bg-red-50 border border-red-100 rounded-lg space-y-4">
+      <p className="text-xs font-semibold text-red-700 uppercase tracking-wide">Printing Configuration</p>
 
       <div>
         <Label htmlFor="printColours">Number of Colours</Label>
