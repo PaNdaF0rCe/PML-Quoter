@@ -22,7 +22,7 @@ const defaultCustomer = (): CustomerDetails => ({
   quotationTitle: '',
   quotationNumber: generateQuotationNumber(),
   quotationDate: todayIso(),
-  validUntil: futureIso(30),
+  validUntil: futureIso(14),
   notes: '',
 })
 
