@@ -1,41 +1,38 @@
-import type { PricingConfig } from '../../lib/pricing/types'
+import type { PricingConfig } from '../../lib/pricingTypes'
 
 export const defaultPricing: PricingConfig = {
-  reelSizes: [
-    { id: 'small', label: 'Small (100mm)', price: 0.005 },
-    { id: 'medium', label: 'Medium (200mm)', price: 0.008 },
-    { id: 'large', label: 'Large (300mm)', price: 0.012 },
-    { id: 'xlarge', label: 'X-Large (400mm)', price: 0.016 },
-  ],
-  quantityTiers: [
-    { qty: 2000, label: '2,000' },
-    { qty: 4000, label: '4,000' },
-    { qty: 6000, label: '6,000' },
-    { qty: 8000, label: '8,000' },
-    { qty: 10000, label: '10,000' },
-    { qty: 15000, label: '15,000' },
-    { qty: 20000, label: '20,000' },
-  ],
-  printColourRates: [
-    { colours: 1, label: '1 Colour', ratePerUnit: 0.003 },
-    { colours: 2, label: '2 Colours', ratePerUnit: 0.005 },
-    { colours: 3, label: '3 Colours', ratePerUnit: 0.007 },
-    { colours: 4, label: '4 Colours (Full)', ratePerUnit: 0.01 },
-  ],
-  printAreaRates: [
-    { id: 'small', label: 'Small (< 50cm²)', ratePerUnit: 0.002 },
-    { id: 'medium', label: 'Medium (50–150cm²)', ratePerUnit: 0.004 },
-    { id: 'large', label: 'Large (> 150cm²)', ratePerUnit: 0.006 },
-  ],
-  materialRates: {
-    twoply: 0.008,
-    threeply: 0.012,
-    lamination: 0.015,
+  materials: {
+    '2ply_brown': 0.101,
+    '2ply_white': 0.140,
+    '3ply_brown': 0.135,
+    '3ply_white': 0.200,
   },
-  addOnRates: {
-    dieCutting: 0.005,
-    sidePasting: 0.005,
-    packagingDelivery: 0.005,
+  boards: {
+    '250gsm': 0.040,
+    '300gsm': 0.048,
   },
-  labourPercentage: 30,
+  addons: {
+    printingPerColour:      2,
+    varnishPerUnit:         2,
+    dieCutterPerPunch:      2,
+    laminatePerSqIn:        0.008,
+    pastingPerUnit:         2,
+    packingDeliveryPerUnit: 1,
+  },
+  surcharges: {
+    twoPlyPercentage: 15,
+  },
+  company: {
+    companyName:  'Pack Me Lanka',
+    legalName:    'Pack Me Lanka (PVT) LTD',
+    address:      'N/A',
+    phone:        'N/A',
+    email:        'N/A',
+    website:      'N/A',
+    brNumber:     'N/A',
+    vatNumber:    'N/A',
+    footerNote:   'Thank you for choosing Pack Me Lanka.',
+    paymentTerms: 'This quotation is subject to final confirmation by production.',
+    bankDetails:  'N/A',
+  },
 }

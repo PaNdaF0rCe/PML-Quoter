@@ -1,32 +1,31 @@
 import { doc, getDoc, setDoc } from 'firebase/firestore'
 import { db } from './config'
 import { defaultPricing } from '../data/defaults/pricing'
-import type { PricingConfig } from '../lib/pricing/types'
+import type { PricingConfig } from '../lib/pricingTypes'
 
-const PRICING_DOC = 'config/pricing'
+const REF = () => doc(db, 'config', 'v2')  // v2 separates from the old reel-based structure
 
 export async function fetchPricing(): Promise<PricingConfig> {
-  const ref = doc(db, 'config', 'pricing')
-  const snap = await getDoc(ref)
+  const snap = await getDoc(REF())
   if (snap.exists()) {
-    return snap.data() as PricingConfig
+    const data = snap.data() as PricingConfig
+    // Basic structural validation — fall back to defaults if the doc is from old schema
+    if (data.materials && data.boards && data.addons && data.surcharges && data.company) {
+      return data
+    }
   }
   return defaultPricing
 }
 
 export async function savePricing(pricing: PricingConfig): Promise<void> {
-  const ref = doc(db, 'config', 'pricing')
-  await setDoc(ref, pricing)
+  await setDoc(REF(), pricing)
 }
 
 export async function seedPricingIfMissing(): Promise<boolean> {
-  const ref = doc(db, 'config', 'pricing')
-  const snap = await getDoc(ref)
+  const snap = await getDoc(REF())
   if (!snap.exists()) {
-    await setDoc(ref, defaultPricing)
+    await setDoc(REF(), defaultPricing)
     return true
   }
   return false
 }
-
-export { PRICING_DOC }

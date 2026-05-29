@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { fetchPricing, savePricing } from '../firebase/pricing'
 import { defaultPricing } from '../data/defaults/pricing'
-import type { PricingConfig } from '../lib/pricing/types'
+import type { PricingConfig } from '../lib/pricingTypes'
 
 interface PricingContextValue {
   pricing: PricingConfig

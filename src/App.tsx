@@ -4,8 +4,27 @@ import { PricingProvider } from './context/PricingContext'
 import CalculatorPage from './pages/CalculatorPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
-import SampleAnalysisPage from './pages/SampleAnalysisPage'
 import ProtectedRoute from './components/ui/ProtectedRoute'
+
+function AnalysisPlaceholder() {
+  return (
+    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
+      <div className="text-center max-w-md">
+        <div className="text-5xl mb-4">🗂️</div>
+        <h1 className="text-xl font-semibold text-gray-800 mb-2">Analysis Module Removed</h1>
+        <p className="text-sm text-gray-500 mb-6">
+          The sample &amp; layout analysis module has been removed in the simplified costing version.
+        </p>
+        <a
+          href="/"
+          className="inline-block px-5 py-2 bg-red-700 text-white text-sm font-medium rounded-lg hover:bg-red-800 transition-colors"
+        >
+          Go to Calculator
+        </a>
+      </div>
+    </div>
+  )
+}
 
 export default function App() {
   return (
@@ -14,7 +33,7 @@ export default function App() {
         <PricingProvider>
           <Routes>
             <Route path="/" element={<CalculatorPage />} />
-            <Route path="/analysis" element={<SampleAnalysisPage />} />
+            <Route path="/analysis" element={<AnalysisPlaceholder />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route
               path="/admin"
