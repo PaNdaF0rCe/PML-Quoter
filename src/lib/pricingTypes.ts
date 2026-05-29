@@ -87,7 +87,7 @@ export interface QuoteInput {
   packingDelivery: boolean
   // ── external costs ──
   laminateType: LaminateType  // external laminate selection
-  foilingCost: number         // manual lump-sum foiling cost (Rs)
+  foilingPerUnit: number      // foiling cost per unit (Rs); 0 = not selected
 }
 
 // ─── Quote result ─────────────────────────────────────────────────────────────

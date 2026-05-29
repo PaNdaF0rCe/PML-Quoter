@@ -251,7 +251,11 @@ export async function generateQuotationPdf(
 
   // Foiling
   if (result.foilingCost > 0) {
-    rows.push(['Foiling (external)', 'Manual entry', fmtRs(result.foilingCost)])
+    rows.push([
+      'Foiling (external)',
+      `Rs. ${fmtNum(input.foilingPerUnit)}/unit × ${qtyStr}`,
+      fmtRs(result.foilingCost),
+    ])
   }
 
   doc.setFillColor(...RED); doc.rect(ML, y, CW, 7, 'F')

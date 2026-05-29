@@ -75,7 +75,7 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     input.pasting                 ||
     input.packingDelivery         ||
     input.laminateType !== 'none' ||
-    input.foilingCost > 0
+    input.foilingPerUnit > 0
   const isTwoPly = isTwoPlyMaterial && !hasExtras
   const twoPlyPercentage = surcharges.twoPlyPercentage
   const twoPlySurcharge  = isTwoPly ? subtotal * (twoPlyPercentage / 100) : 0
@@ -93,7 +93,7 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
 
   // ── Foiling cost ──────────────────────────────────────────────────────────
   // Manual lump-sum entry — passed through directly.
-  const foilingCost = input.foilingCost > 0 ? input.foilingCost : 0
+  const foilingCost = input.foilingPerUnit > 0 ? input.foilingPerUnit * quantity : 0
 
   // ── Grand total ───────────────────────────────────────────────────────────
   const total = subtotal + twoPlySurcharge + externalLaminateCost + foilingCost

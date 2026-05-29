@@ -40,7 +40,7 @@ const defaultInput: QuoteInput = {
   pasting: false,
   packingDelivery: false,
   laminateType: 'none',
-  foilingCost: 0,
+  foilingPerUnit: 0,
 }
 
 // ─── Tiny helpers ─────────────────────────────────────────────────────────────
@@ -107,6 +107,7 @@ export default function CalculatorPage() {
   const [savedMsg, setSavedMsg] = useState('')
   const [currentSavedId, setCurrentSavedId] = useState<string | null>(savedId ?? null)
   const [showCustomer, setShowCustomer] = useState(true)
+  const [foilingEnabled, setFoilingEnabled] = useState(false)
 
   // Load saved quote if URL has an ID
   useEffect(() => {
@@ -115,6 +116,7 @@ export default function CalculatorPage() {
         if (q) {
           setCustomer(q.customer)
           setInput(q.input)
+          setFoilingEnabled(q.input.foilingPerUnit > 0)
           setCurrentSavedId(savedId)
         }
       })
@@ -561,43 +563,96 @@ export default function CalculatorPage() {
 
             {/* External Costs */}
             <Card title="External Costs">
-              {/* Laminate selection */}
-              <div className="mb-4">
-                <Label>Laminate Type</Label>
-                <div className="grid grid-cols-2 gap-2 mt-1">
-                  {(['none', 'hot', 'cold', 'uv'] as LaminateType[]).map(type => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setIn('laminateType', type)}
-                      className={`p-2.5 rounded-xl border-2 text-left transition-all ${
-                        input.laminateType === type
-                          ? 'border-red-700 bg-red-50'
-                          : 'border-gray-200 bg-white hover:border-red-300'
-                      }`}
-                    >
-                      <span className="block text-sm font-semibold text-gray-900">{LAMINATE_LABELS[type]}</span>
-                      {type !== 'none' && (
-                        <span className="block text-xs text-gray-500 mt-0.5">{laminateNote(type)}</span>
-                      )}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <div className="space-y-2">
 
-              {/* Foiling — manual entry */}
-              <div>
-                <Label htmlFor="foiling">Foiling Cost (Rs) — enter total manually</Label>
-                <Input
-                  id="foiling"
-                  type="number"
-                  min={0}
-                  step={100}
-                  value={input.foilingCost || ''}
-                  onChange={e => setIn('foilingCost', Math.max(0, Number(e.target.value)))}
-                  placeholder="0.00"
-                />
-                <p className="mt-1 text-xs text-gray-400">Enter the total foiling cost for the full order (not per unit).</p>
+                {/* External Laminate — toggle, then choose type */}
+                <div className={`rounded-xl border-2 transition-colors ${
+                  input.laminateType !== 'none' ? 'border-red-700 bg-red-50' : 'border-gray-200'
+                }`}>
+                  <label className="flex items-center gap-3 p-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={input.laminateType !== 'none'}
+                      onChange={e => setIn('laminateType', e.target.checked ? 'hot' : 'none')}
+                      className="h-4 w-4 rounded border-gray-300 text-red-700 focus:ring-red-500"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-gray-800">External Laminate</span>
+                      <span className="block text-xs text-gray-400 mt-0.5">
+                        {input.laminateType !== 'none'
+                          ? laminateNote(input.laminateType)
+                          : 'Hot / Cold / UV coating on the finished sheet'}
+                      </span>
+                    </span>
+                  </label>
+                  {input.laminateType !== 'none' && (
+                    <div className="px-3 pb-3">
+                      <div className="grid grid-cols-3 gap-2">
+                        {(['hot', 'cold', 'uv'] as Exclude<LaminateType, 'none'>[]).map(type => (
+                          <button
+                            key={type}
+                            type="button"
+                            onClick={() => setIn('laminateType', type)}
+                            className={`p-2 rounded-lg border-2 text-center transition-all ${
+                              input.laminateType === type
+                                ? 'border-red-700 bg-white'
+                                : 'border-gray-200 bg-white hover:border-red-300'
+                            }`}
+                          >
+                            <span className="block text-xs font-semibold text-gray-900">{LAMINATE_LABELS[type]}</span>
+                            <span className="block text-xs text-gray-400 mt-0.5">{laminateNote(type)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Foiling — toggle, then enter per-unit cost */}
+                <div className={`rounded-xl border-2 transition-colors ${
+                  foilingEnabled ? 'border-red-700 bg-red-50' : 'border-gray-200'
+                }`}>
+                  <label className="flex items-center gap-3 p-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={foilingEnabled}
+                      onChange={e => {
+                        setFoilingEnabled(e.target.checked)
+                        if (!e.target.checked) setIn('foilingPerUnit', 0)
+                      }}
+                      className="h-4 w-4 rounded border-gray-300 text-red-700 focus:ring-red-500"
+                    />
+                    <span>
+                      <span className="block text-sm font-medium text-gray-800">Foiling</span>
+                      <span className="block text-xs text-gray-400 mt-0.5">
+                        {foilingEnabled && input.foilingPerUnit > 0 && input.quantity > 0
+                          ? `Rs. ${input.foilingPerUnit}/unit × ${input.quantity.toLocaleString()} = ${fmtRs(input.foilingPerUnit * input.quantity)}`
+                          : 'Enter cost per unit'}
+                      </span>
+                    </span>
+                  </label>
+                  {foilingEnabled && (
+                    <div className="px-3 pb-3 space-y-1">
+                      <Label htmlFor="foilingPerUnit">Cost per unit (Rs)</Label>
+                      <Input
+                        id="foilingPerUnit"
+                        type="number"
+                        min={0}
+                        step={1}
+                        value={input.foilingPerUnit || ''}
+                        onChange={e => setIn('foilingPerUnit', Math.max(0, Number(e.target.value)))}
+                        placeholder="e.g. 25.00"
+                      />
+                      {input.quantity > 0 && input.foilingPerUnit > 0 && (
+                        <p className="text-xs text-gray-500">
+                          Total: <strong>{fmtRs(input.foilingPerUnit * input.quantity)}</strong>
+                          <span className="text-gray-400"> ({input.quantity.toLocaleString()} units)</span>
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
+
               </div>
             </Card>
 
@@ -609,7 +664,7 @@ export default function CalculatorPage() {
 
               {!isValid && (
                 <div className="rounded-xl border-2 border-dashed border-gray-300 bg-white p-8 text-center text-gray-400 text-sm">
-                  Enter square inches per unit and quantity to see your quotation.
+                  Enter dimensions and quantity to see your quotation.
                 </div>
               )}
 
