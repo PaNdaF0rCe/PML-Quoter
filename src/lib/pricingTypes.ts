@@ -27,7 +27,7 @@ export interface AddOnRates {
 }
 
 export interface Surcharges {
-  twoPlyPercentage: number      // % added to subtotal when material is 2-ply
+  twoPlyPercentage: number      // % added to subtotal when material is 2-ply only (no board or add-ons)
 }
 
 export interface CompanySettings {

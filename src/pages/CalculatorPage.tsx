@@ -281,7 +281,7 @@ export default function CalculatorPage() {
                     </span>
                     {(id === '2ply_brown' || id === '2ply_white') && (
                       <span className="block text-xs text-amber-600 mt-0.5">
-                        +{pricing.surcharges.twoPlyPercentage}% surcharge applies
+                        +{pricing.surcharges.twoPlyPercentage}% if 2-ply only
                       </span>
                     )}
                   </button>

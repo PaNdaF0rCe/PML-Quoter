@@ -72,8 +72,20 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     packingDeliveryCost
 
   // ── 2 Ply surcharge / margin ──────────────────────────────────────────────
-  // twoPlySurcharge = subtotal × twoPlyPercentage / 100  (only for 2-ply materials)
-  const isTwoPly = input.material === '2ply_brown' || input.material === '2ply_white'
+  // Surcharge applies ONLY when:
+  //   • material is 2-ply, AND
+  //   • the customer has ordered nothing else (no board, no add-ons)
+  // If any board or add-on is selected alongside 2-ply, no surcharge.
+  const isTwoPlyMaterial = input.material === '2ply_brown' || input.material === '2ply_white'
+  const hasExtras =
+    input.board !== 'none' ||
+    input.printing ||
+    input.varnish ||
+    input.dieCutting ||
+    input.lamination ||
+    input.pasting ||
+    input.packingDelivery
+  const isTwoPly = isTwoPlyMaterial && !hasExtras   // true = surcharge is applied
   const twoPlyPercentage = surcharges.twoPlyPercentage
   const twoPlySurcharge = isTwoPly ? subtotal * (twoPlyPercentage / 100) : 0
 
