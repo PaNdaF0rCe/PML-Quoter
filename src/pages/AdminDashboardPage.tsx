@@ -225,11 +225,11 @@ export default function AdminDashboardPage() {
               onChange={v => setAddon('dieCutterPerPunch', v)}
             />
             <RateField
-              label="Lamination"
+              label="E-Flute Lamination"
               hint="Rs per in²"
               step={0.001}
-              value={local.addons.laminatePerSqIn}
-              onChange={v => setAddon('laminatePerSqIn', v)}
+              value={local.addons.eFluteLaminatePerSqIn}
+              onChange={v => setAddon('eFluteLaminatePerSqIn', v)}
             />
             <RateField
               label="P&D / Side Pasting"
@@ -245,6 +245,29 @@ export default function AdminDashboardPage() {
               value={local.addons.packingDeliveryPerUnit}
               onChange={v => setAddon('packingDeliveryPerUnit', v)}
             />
+          </div>
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">External Laminate Rates (Rs per in²)</p>
+            <div className="grid grid-cols-3 gap-4">
+              <RateField
+                label="Hot Laminate"
+                step={0.001}
+                value={local.addons.hotLaminatePerSqIn}
+                onChange={v => setAddon('hotLaminatePerSqIn', v)}
+              />
+              <RateField
+                label="Cold Laminate"
+                step={0.001}
+                value={local.addons.coldLaminatePerSqIn}
+                onChange={v => setAddon('coldLaminatePerSqIn', v)}
+              />
+              <RateField
+                label="UV"
+                step={0.001}
+                value={local.addons.uvLaminatePerSqIn}
+                onChange={v => setAddon('uvLaminatePerSqIn', v)}
+              />
+            </div>
           </div>
         </SectionCard>
 

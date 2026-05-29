@@ -18,79 +18,84 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
   const totalArea = sqIn * quantity
 
   // ── Material cost ─────────────────────────────────────────────────────────
-  // materialCost = sqIn × qty × rate/in²
-  const materialRate = materials[input.material]
+  // 'none' = Board Only mode — no material cost
+  const materialRate = input.material !== 'none' ? materials[input.material] : 0
   const materialCost = totalArea * materialRate
 
   // ── Board cost ────────────────────────────────────────────────────────────
-  // boardCost = sqIn × qty × rate/in²   (0 if board is 'none')
-  const boardCost =
-    input.board !== 'none' ? totalArea * boards[input.board] : 0
+  const boardCost = input.board !== 'none' ? totalArea * boards[input.board] : 0
 
   // ── Printing cost ─────────────────────────────────────────────────────────
-  // printingCost = colourCount × printingPerColour × qty
-  // CMYK = 4 colours
   const printingCost = input.printing
     ? input.colourCount * addons.printingPerColour * quantity
     : 0
 
   // ── Varnish cost ──────────────────────────────────────────────────────────
-  // varnishCost = varnishPerUnit × qty
   const varnishCost = input.varnish ? addons.varnishPerUnit * quantity : 0
 
   // ── Die cutting cost ──────────────────────────────────────────────────────
-  // dieCuttingCost = dieCutterPerPunch × qty
-  const dieCuttingCost = input.dieCutting
-    ? addons.dieCutterPerPunch * quantity
-    : 0
+  const dieCuttingCost = input.dieCutting ? addons.dieCutterPerPunch * quantity : 0
 
-  // ── Lamination cost ───────────────────────────────────────────────────────
-  // laminateCost = sqIn × qty × laminatePerSqIn
-  const laminateCost = input.lamination
-    ? totalArea * addons.laminatePerSqIn
+  // ── E-Flute lamination cost ───────────────────────────────────────────────
+  // Compulsory when printing is on; also selectable independently
+  const eFluteLaminateCost = input.eFluteLamination
+    ? totalArea * addons.eFluteLaminatePerSqIn
     : 0
 
   // ── P&D + side pasting cost ───────────────────────────────────────────────
-  // pastingCost = pastingPerUnit × qty
   const pastingCost = input.pasting ? addons.pastingPerUnit * quantity : 0
 
   // ── Packing & delivery cost ───────────────────────────────────────────────
-  // packingDeliveryCost = packingDeliveryPerUnit × qty
   const packingDeliveryCost = input.packingDelivery
     ? addons.packingDeliveryPerUnit * quantity
     : 0
 
-  // ── Subtotal ──────────────────────────────────────────────────────────────
+  // ── Subtotal (core costs) ─────────────────────────────────────────────────
   const subtotal =
     materialCost +
     boardCost +
     printingCost +
     varnishCost +
     dieCuttingCost +
-    laminateCost +
+    eFluteLaminateCost +
     pastingCost +
     packingDeliveryCost
 
-  // ── 2 Ply surcharge / margin ──────────────────────────────────────────────
-  // Surcharge applies ONLY when:
-  //   • material is 2-ply, AND
-  //   • the customer has ordered nothing else (no board, no add-ons)
-  // If any board or add-on is selected alongside 2-ply, no surcharge.
+  // ── 2-Ply surcharge ───────────────────────────────────────────────────────
+  // Applies ONLY when material is 2-ply AND the customer ordered nothing else
+  // (no board, no add-ons, no external costs).
   const isTwoPlyMaterial = input.material === '2ply_brown' || input.material === '2ply_white'
   const hasExtras =
-    input.board !== 'none' ||
-    input.printing ||
-    input.varnish ||
-    input.dieCutting ||
-    input.lamination ||
-    input.pasting ||
-    input.packingDelivery
-  const isTwoPly = isTwoPlyMaterial && !hasExtras   // true = surcharge is applied
+    input.board !== 'none'        ||
+    input.printing                ||
+    input.varnish                 ||
+    input.dieCutting              ||
+    input.eFluteLamination        ||
+    input.pasting                 ||
+    input.packingDelivery         ||
+    input.laminateType !== 'none' ||
+    input.foilingCost > 0
+  const isTwoPly = isTwoPlyMaterial && !hasExtras
   const twoPlyPercentage = surcharges.twoPlyPercentage
-  const twoPlySurcharge = isTwoPly ? subtotal * (twoPlyPercentage / 100) : 0
+  const twoPlySurcharge  = isTwoPly ? subtotal * (twoPlyPercentage / 100) : 0
 
-  // ── Total ─────────────────────────────────────────────────────────────────
-  const total = subtotal + twoPlySurcharge
+  // ── External laminate cost ────────────────────────────────────────────────
+  // Added on top of subtotal + surcharge; not subject to 2-ply surcharge.
+  const laminateRates: Record<string, number> = {
+    hot:  addons.hotLaminatePerSqIn,
+    cold: addons.coldLaminatePerSqIn,
+    uv:   addons.uvLaminatePerSqIn,
+  }
+  const externalLaminateCost = input.laminateType !== 'none'
+    ? totalArea * (laminateRates[input.laminateType] ?? 0)
+    : 0
+
+  // ── Foiling cost ──────────────────────────────────────────────────────────
+  // Manual lump-sum entry — passed through directly.
+  const foilingCost = input.foilingCost > 0 ? input.foilingCost : 0
+
+  // ── Grand total ───────────────────────────────────────────────────────────
+  const total = subtotal + twoPlySurcharge + externalLaminateCost + foilingCost
 
   // ── Per-unit price ────────────────────────────────────────────────────────
   const perUnitPrice = total / quantity
@@ -102,12 +107,14 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     printingCost,
     varnishCost,
     dieCuttingCost,
-    laminateCost,
+    eFluteLaminateCost,
     pastingCost,
     packingDeliveryCost,
     subtotal,
     twoPlySurcharge,
     twoPlyPercentage,
+    externalLaminateCost,
+    foilingCost,
     total,
     perUnitPrice,
     isTwoPly,
@@ -127,9 +134,9 @@ export function fmtNum(n: number): string {
 // ─── Auto quotation number ────────────────────────────────────────────────────
 
 export function generateQuotationNumber(): string {
-  const now = new Date()
-  const yy  = String(now.getFullYear()).slice(-2)
-  const mmm = now.toLocaleString('en-US', { month: 'short' }).toUpperCase()
+  const now  = new Date()
+  const yy   = String(now.getFullYear()).slice(-2)
+  const mmm  = now.toLocaleString('en-US', { month: 'short' }).toUpperCase()
   const xxxx = String(Math.floor(Math.random() * 9000) + 1000)
   return `${yy}${mmm}${xxxx}`
 }

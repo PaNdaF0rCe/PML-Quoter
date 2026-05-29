@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { PricingProvider } from './context/PricingContext'
+import HomePage from './pages/HomePage'
 import CalculatorPage from './pages/CalculatorPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
@@ -19,7 +20,7 @@ function AnalysisPlaceholder() {
           href="/"
           className="inline-block px-5 py-2 bg-red-700 text-white text-sm font-medium rounded-lg hover:bg-red-800 transition-colors"
         >
-          Go to Calculator
+          Go to Quotes
         </a>
       </div>
     </div>
@@ -32,7 +33,9 @@ export default function App() {
       <AuthProvider>
         <PricingProvider>
           <Routes>
-            <Route path="/" element={<CalculatorPage />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/calculator" element={<CalculatorPage />} />
+            <Route path="/calculator/:id" element={<CalculatorPage />} />
             <Route path="/analysis" element={<AnalysisPlaceholder />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route
