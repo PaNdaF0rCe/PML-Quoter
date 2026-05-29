@@ -154,8 +154,8 @@ export async function generateQuotationPdf(
     ...(input.varnish ? [['Varnish', 'Yes'] as [string, string]] : []),
     ...(input.dieCutting ? [['Die Cutting', 'Yes'] as [string, string]] : []),
     ...(input.eFluteLamination ? [['E-Flute Lamination', 'Yes'] as [string, string]] : []),
-    ...(input.pasting ? [['P&D + Side Pasting', 'Yes'] as [string, string]] : []),
-    ...(input.packingDelivery ? [['Packing & Delivery', 'Yes'] as [string, string]] : []),
+    ...(input.pasting ? [['Side Pasting', 'Yes'] as [string, string]] : []),
+    ['Packing & Delivery', 'Included'] as [string, string],
     ...(input.laminateType !== 'none' ? [['External Laminate', laminateLabel] as [string, string]] : []),
     ...(result.foilingCost > 0 ? [['Foiling', fmtRs(result.foilingCost)] as [string, string]] : []),
   ]
@@ -227,12 +227,10 @@ export async function generateQuotationPdf(
   }
 
   if (result.pastingCost > 0) {
-    rows.push(['P&D + Side Pasting', `Rs. ${pricing.addons.pastingPerUnit}/unit × ${qtyStr}`, fmtRs(result.pastingCost)])
+    rows.push(['Side Pasting', `Rs. ${pricing.addons.pastingPerUnit}/unit × ${qtyStr}`, fmtRs(result.pastingCost)])
   }
 
-  if (result.packingDeliveryCost > 0) {
-    rows.push(['Packing & Delivery', `Rs. ${pricing.addons.packingDeliveryPerUnit}/unit × ${qtyStr}`, fmtRs(result.packingDeliveryCost)])
-  }
+  rows.push(['Packing & Delivery', `Rs. ${pricing.addons.packingDeliveryPerUnit}/unit × ${qtyStr}`, fmtRs(result.packingDeliveryCost)])
 
   // External laminate
   if (result.externalLaminateCost > 0) {

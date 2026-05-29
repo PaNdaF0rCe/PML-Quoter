@@ -84,7 +84,6 @@ export interface QuoteInput {
   dieCutting: boolean
   eFluteLamination: boolean // compulsory when printing = true
   pasting: boolean
-  packingDelivery: boolean
   // ── external costs ──
   laminateType: LaminateType  // external laminate selection
   foilingPerUnit: number      // foiling cost per unit (Rs); 0 = not selected

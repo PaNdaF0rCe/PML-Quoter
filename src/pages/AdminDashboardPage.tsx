@@ -232,7 +232,7 @@ export default function AdminDashboardPage() {
               onChange={v => setAddon('eFluteLaminatePerSqIn', v)}
             />
             <RateField
-              label="P&D / Side Pasting"
+              label="Side Pasting"
               hint="Rs per unit"
               step={0.5}
               value={local.addons.pastingPerUnit}

@@ -38,7 +38,6 @@ const defaultInput: QuoteInput = {
   dieCutting: false,
   eFluteLamination: false,
   pasting: false,
-  packingDelivery: false,
   laminateType: 'none',
   foilingPerUnit: 0,
 }
@@ -545,18 +544,10 @@ export default function CalculatorPage() {
 
                 <AddonCheckbox
                   id="pasting"
-                  label="P&D + Side Pasting"
+                  label="Side Pasting"
                   checked={input.pasting}
                   onChange={v => setIn('pasting', v)}
                   note={addonNote(pricing.addons.pastingPerUnit, 'unit')}
-                />
-
-                <AddonCheckbox
-                  id="packingDelivery"
-                  label="Packing & Delivery"
-                  checked={input.packingDelivery}
-                  onChange={v => setIn('packingDelivery', v)}
-                  note={addonNote(pricing.addons.packingDeliveryPerUnit, 'unit')}
                 />
               </div>
             </Card>
@@ -694,8 +685,8 @@ export default function CalculatorPage() {
                     {quote.varnishCost > 0 && <CostRow label="Varnish" value={fmtRs(quote.varnishCost)} />}
                     {quote.dieCuttingCost > 0 && <CostRow label="Die Cutting" value={fmtRs(quote.dieCuttingCost)} />}
                     {quote.eFluteLaminateCost > 0 && <CostRow label="E-Flute Lamination" value={fmtRs(quote.eFluteLaminateCost)} />}
-                    {quote.pastingCost > 0 && <CostRow label="P&D + Side Pasting" value={fmtRs(quote.pastingCost)} />}
-                    {quote.packingDeliveryCost > 0 && <CostRow label="Packing & Delivery" value={fmtRs(quote.packingDeliveryCost)} />}
+                    {quote.pastingCost > 0 && <CostRow label="Side Pasting" value={fmtRs(quote.pastingCost)} />}
+                    <CostRow label="Packing & Delivery" value={fmtRs(quote.packingDeliveryCost)} />
                   </div>
 
                   {/* Totals */}

@@ -43,13 +43,11 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     ? totalArea * addons.eFluteLaminatePerSqIn
     : 0
 
-  // ── P&D + side pasting cost ───────────────────────────────────────────────
+  // ── Side pasting cost ─────────────────────────────────────────────────────
   const pastingCost = input.pasting ? addons.pastingPerUnit * quantity : 0
 
-  // ── Packing & delivery cost ───────────────────────────────────────────────
-  const packingDeliveryCost = input.packingDelivery
-    ? addons.packingDeliveryPerUnit * quantity
-    : 0
+  // ── Packing & delivery cost (always included) ─────────────────────────────
+  const packingDeliveryCost = addons.packingDeliveryPerUnit * quantity
 
   // ── Subtotal (core costs) ─────────────────────────────────────────────────
   const subtotal =
@@ -73,7 +71,6 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     input.dieCutting              ||
     input.eFluteLamination        ||
     input.pasting                 ||
-    input.packingDelivery         ||
     input.laminateType !== 'none' ||
     input.foilingPerUnit > 0
   const isTwoPly = isTwoPlyMaterial && !hasExtras
