@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import logo from '../assets/logo.webp'
+const logo = '/logo.webp'
 import { usePricing } from '../context/PricingContext'
 import { defaultPricing } from '../data/defaults/pricing'
 import type { PricingConfig } from '../lib/pricingTypes'

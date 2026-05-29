@@ -25,9 +25,9 @@ export const defaultPricing: PricingConfig = {
   company: {
     companyName:  'Pack Me Lanka',
     legalName:    'Pack Me Lanka (PVT) LTD',
-    address:      'N/A',
-    phone:        'N/A',
-    email:        'N/A',
+    address:      '34/A, Canal Road, Mihindu Mawatha, Malabe, Sri Lanka',
+    phone:        '+94 77 267 1466',
+    email:        'packmelanka@gmail.com',
     website:      'N/A',
     brNumber:     'N/A',
     vatNumber:    'N/A',

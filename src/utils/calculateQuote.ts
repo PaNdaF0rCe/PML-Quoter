@@ -116,11 +116,10 @@ export function fmtNum(n: number): string {
 
 export function generateQuotationNumber(): string {
   const now = new Date()
-  const y = now.getFullYear()
-  const m = String(now.getMonth() + 1).padStart(2, '0')
-  const d = String(now.getDate()).padStart(2, '0')
-  const n = String(Math.floor(Math.random() * 900) + 100)
-  return `PML-QTN-${y}${m}${d}-${n}`
+  const yy  = String(now.getFullYear()).slice(-2)
+  const mmm = now.toLocaleString('en-US', { month: 'short' }).toUpperCase()
+  const xxxx = String(Math.floor(Math.random() * 9000) + 1000)
+  return `${yy}${mmm}${xxxx}`
 }
 
 export function todayIso(): string {
