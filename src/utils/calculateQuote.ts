@@ -92,10 +92,23 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
   // Manual lump-sum entry — passed through directly.
   const foilingCost = input.foilingPerUnit > 0 ? input.foilingPerUnit * quantity : 0
 
-  // ── Grand total ───────────────────────────────────────────────────────────
-  const total = subtotal + twoPlySurcharge + externalLaminateCost + foilingCost
+  // ── Base total (before additional charges) ───────────────────────────────
+  const baseTotal = subtotal + twoPlySurcharge + externalLaminateCost + foilingCost
 
-  // ── Per-unit price ────────────────────────────────────────────────────────
+  // ── Additional charges (each stacks on the running total) ────────────────
+  const c1Pct = input.charge1Pct ?? 0
+  const c2Pct = input.charge2Pct ?? 0
+  const c3Pct = input.charge3Pct ?? 0
+
+  const after1        = c1Pct > 0 ? baseTotal * (1 + c1Pct / 100) : baseTotal
+  const charge1Amount = after1 - baseTotal
+  const after2        = c2Pct > 0 ? after1 * (1 + c2Pct / 100) : after1
+  const charge2Amount = after2 - after1
+  const after3        = c3Pct > 0 ? after2 * (1 + c3Pct / 100) : after2
+  const charge3Amount = after3 - after2
+
+  // ── Grand total & per-unit ────────────────────────────────────────────────
+  const total        = after3
   const perUnitPrice = total / quantity
 
   return {
@@ -113,6 +126,10 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     twoPlyPercentage,
     externalLaminateCost,
     foilingCost,
+    baseTotal,
+    charge1Amount,
+    charge2Amount,
+    charge3Amount,
     total,
     perUnitPrice,
     isTwoPly,

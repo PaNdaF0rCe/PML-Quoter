@@ -89,6 +89,10 @@ export interface QuoteInput {
   // ── external costs ──
   laminateType: LaminateType  // external laminate selection
   foilingPerUnit: number      // foiling cost per unit (Rs); 0 = not selected
+  // ── additional charges (internal markup — not shown in customer PDF) ──
+  charge1Pct: number          // additional charge 1 (%)
+  charge2Pct: number          // additional charge 2 (%)
+  charge3Pct: number          // additional charge 3 (%)
 }
 
 // ─── Quote result ─────────────────────────────────────────────────────────────
@@ -109,7 +113,12 @@ export interface QuoteResult {
   // external costs (not subject to 2-ply surcharge)
   externalLaminateCost: number
   foilingCost: number
-  total: number
+  // totals
+  baseTotal: number         // total before additional charges
+  charge1Amount: number
+  charge2Amount: number
+  charge3Amount: number
+  total: number             // final total after all charges
   perUnitPrice: number
   isTwoPly: boolean
 }

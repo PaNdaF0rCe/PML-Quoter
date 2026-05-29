@@ -40,6 +40,9 @@ const defaultInput: QuoteInput = {
   pasting: false,
   laminateType: 'none',
   foilingPerUnit: 0,
+  charge1Pct: 0,
+  charge2Pct: 0,
+  charge3Pct: 0,
 }
 
 // ─── Tiny helpers ─────────────────────────────────────────────────────────────
@@ -632,6 +635,43 @@ export default function CalculatorPage() {
               </div>
             </Card>
 
+            {/* Additional Charges */}
+            <Card title="Additional Charges">
+              <p className="text-xs text-gray-400 mb-3">
+                Internal markup percentages — applied sequentially to the running total.
+                Not shown on the customer PDF.
+              </p>
+              <div className="space-y-3">
+                {([
+                  { label: 'Charge 1', pctKey: 'charge1Pct' as const, amount: quote?.charge1Amount ?? 0 },
+                  { label: 'Charge 2', pctKey: 'charge2Pct' as const, amount: quote?.charge2Amount ?? 0 },
+                  { label: 'Charge 3', pctKey: 'charge3Pct' as const, amount: quote?.charge3Amount ?? 0 },
+                ]).map(({ label, pctKey, amount }) => (
+                  <div key={pctKey} className="flex items-center gap-3">
+                    <span className="text-sm text-gray-600 w-16 shrink-0">{label}</span>
+                    <div className="flex items-center gap-1.5">
+                      <Input
+                        type="number"
+                        min={0}
+                        max={100}
+                        step={0.5}
+                        value={input[pctKey] || ''}
+                        onChange={e => setIn(pctKey, Math.max(0, Number(e.target.value)))}
+                        placeholder="0"
+                        className="w-20 text-center"
+                      />
+                      <span className="text-sm text-gray-500">%</span>
+                    </div>
+                    {(input[pctKey] as number) > 0 && isValid && (
+                      <span className="text-sm text-gray-500 tabular-nums ml-1">
+                        + {fmtRs(amount)}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </Card>
+
           </div>
 
           {/* ── RIGHT COLUMN — live summary ─────────────────────────────────── */}
@@ -682,7 +722,6 @@ export default function CalculatorPage() {
                         <CostRow
                           label={`2 Ply Surcharge (${quote.twoPlyPercentage}%)`}
                           value={fmtRs(quote.twoPlySurcharge)}
-                          highlight
                         />
                       )}
                     </div>
@@ -691,12 +730,32 @@ export default function CalculatorPage() {
                       <div className="border-t border-dashed border-gray-200 pt-2 space-y-0.5">
                         <p className="text-xs text-gray-400 uppercase tracking-wide pt-1 pb-0.5">External Costs</p>
                         {quote.externalLaminateCost > 0 && (
-                          <CostRow label={`${LAMINATE_LABELS[input.laminateType]}`} value={fmtRs(quote.externalLaminateCost)} />
+                          <CostRow label={LAMINATE_LABELS[input.laminateType]} value={fmtRs(quote.externalLaminateCost)} />
                         )}
                         {quote.foilingCost > 0 && (
                           <CostRow label="Foiling" value={fmtRs(quote.foilingCost)} />
                         )}
                       </div>
+                    )}
+                    {/* Additional charges */}
+                    {(quote.charge1Amount > 0 || quote.charge2Amount > 0 || quote.charge3Amount > 0) && (
+                      <>
+                        <div className="border-t border-dashed border-gray-200 pt-2">
+                          <CostRow label="Base Total" value={fmtRs(quote.baseTotal)} highlight />
+                        </div>
+                        <div className="border-t border-dashed border-gray-200 pt-2 space-y-0.5">
+                          <p className="text-xs text-gray-400 uppercase tracking-wide pt-1 pb-0.5">Additional Charges</p>
+                          {quote.charge1Amount > 0 && (
+                            <CostRow label={`Charge 1 (${input.charge1Pct}%)`} value={fmtRs(quote.charge1Amount)} />
+                          )}
+                          {quote.charge2Amount > 0 && (
+                            <CostRow label={`Charge 2 (${input.charge2Pct}%)`} value={fmtRs(quote.charge2Amount)} />
+                          )}
+                          {quote.charge3Amount > 0 && (
+                            <CostRow label={`Charge 3 (${input.charge3Pct}%)`} value={fmtRs(quote.charge3Amount)} />
+                          )}
+                        </div>
+                      </>
                     )}
                     <div className="border-t-2 border-red-200 pt-3 flex items-center justify-between">
                       <span className="text-base font-bold text-gray-900">Final Total</span>
