@@ -1,16 +1,18 @@
 // ─── Material / board / laminate IDs ─────────────────────────────────────────
 
-export type MaterialId = '2ply_brown' | '2ply_white' | '3ply_brown' | '3ply_white' | 'none'
+export type MaterialId = '2ply_brown' | '2ply_white' | '3ply_brown' | '3ply_white' | '2ply_bflute' | '3ply_bflute' | 'none'
 export type BoardId    = 'none' | '250gsm' | '300gsm'
 export type LaminateType = 'none' | 'hot' | 'cold' | 'uv'
 
 // ─── Pricing config (stored in Firestore, editable in admin) ─────────────────
 
 export interface MaterialRates {
-  '2ply_brown': number   // Rs per in²
-  '2ply_white': number
-  '3ply_brown': number
-  '3ply_white': number
+  '2ply_brown':  number   // Rs per in²
+  '2ply_white':  number
+  '3ply_brown':  number
+  '3ply_white':  number
+  '2ply_bflute': number
+  '3ply_bflute': number
   // 'none' (board-only) has no rate
 }
 
@@ -125,11 +127,13 @@ export interface SavedQuote {
 // ─── Display helpers ──────────────────────────────────────────────────────────
 
 export const MATERIAL_LABELS: Record<MaterialId, string> = {
-  '2ply_brown': '2 Ply Brown',
-  '2ply_white': '2 Ply White',
-  '3ply_brown': '3 Ply Brown',
-  '3ply_white': '3 Ply White',
-  'none':       'Board Only',
+  '2ply_brown':  '2 Ply Brown',
+  '2ply_white':  '2 Ply White',
+  '3ply_brown':  '3 Ply Brown',
+  '3ply_white':  '3 Ply White',
+  '2ply_bflute': '2 Ply B-Flute',
+  '3ply_bflute': '3 Ply B-Flute',
+  'none':        'Board Only',
 }
 
 export const BOARD_LABELS: Record<BoardId, string> = {

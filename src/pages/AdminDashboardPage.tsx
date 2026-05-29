@@ -180,6 +180,16 @@ export default function AdminDashboardPage() {
               value={local.materials['3ply_white']}
               onChange={v => setMaterial('3ply_white', v)}
             />
+            <RateField
+              label="2 Ply B-Flute"
+              value={local.materials['2ply_bflute']}
+              onChange={v => setMaterial('2ply_bflute', v)}
+            />
+            <RateField
+              label="3 Ply B-Flute"
+              value={local.materials['3ply_bflute']}
+              onChange={v => setMaterial('3ply_bflute', v)}
+            />
           </div>
         </SectionCard>
 

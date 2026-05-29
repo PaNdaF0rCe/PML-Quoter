@@ -135,13 +135,8 @@ export default function CalculatorPage() {
     setCustomer(p => ({ ...p, [k]: v }))
   }, [])
 
-  // Printing rules: when printing is enabled, auto-select varnish + e-flute and lock them
   const handlePrintingChange = (checked: boolean) => {
-    setInput(p => ({
-      ...p,
-      printing: checked,
-      ...(checked ? { varnish: true, eFluteLamination: true } : {}),
-    }))
+    setIn('printing', checked)
   }
 
   const handleReset = () => {
@@ -371,8 +366,7 @@ export default function CalculatorPage() {
             {/* Material */}
             <Card title="Material">
               <div className="grid grid-cols-2 gap-2">
-                {/* 4 ply options */}
-                {(['2ply_brown', '2ply_white', '3ply_brown', '3ply_white'] as Exclude<MaterialId, 'none'>[]).map(id => (
+                {(['2ply_brown', '2ply_white', '3ply_brown', '3ply_white', '2ply_bflute', '3ply_bflute'] as Exclude<MaterialId, 'none'>[]).map(id => (
                   <button
                     key={id}
                     type="button"
@@ -461,7 +455,6 @@ export default function CalculatorPage() {
                       <span className="block text-sm font-medium text-gray-800">Printing required</span>
                       <span className="block text-xs text-gray-400 mt-0.5">
                         {addonNote(pricing.addons.printingPerColour, 'colour per unit')}
-                        {!input.printing && ' · enables varnish & e-flute lamination'}
                       </span>
                     </span>
                   </label>
@@ -510,16 +503,12 @@ export default function CalculatorPage() {
                   )}
                 </div>
 
-                {/* Varnish — locked when printing on */}
                 <AddonCheckbox
                   id="varnish"
                   label="Varnish"
                   checked={input.varnish}
                   onChange={v => setIn('varnish', v)}
-                  locked={input.printing}
-                  note={input.printing
-                    ? 'Compulsory when printing is selected'
-                    : addonNote(pricing.addons.varnishPerUnit, 'unit')}
+                  note={addonNote(pricing.addons.varnishPerUnit, 'unit')}
                 />
 
                 <AddonCheckbox
@@ -530,16 +519,12 @@ export default function CalculatorPage() {
                   note={addonNote(pricing.addons.dieCutterPerPunch, 'punch/unit')}
                 />
 
-                {/* E-Flute Lamination — locked when printing on */}
                 <AddonCheckbox
                   id="eFluteLamination"
                   label="E-Flute Lamination"
                   checked={input.eFluteLamination}
                   onChange={v => setIn('eFluteLamination', v)}
-                  locked={input.printing}
-                  note={input.printing
-                    ? 'Compulsory when printing is selected'
-                    : addonNote(pricing.addons.eFluteLaminatePerSqIn, 'in²')}
+                  note={addonNote(pricing.addons.eFluteLaminatePerSqIn, 'in²')}
                 />
 
                 <AddonCheckbox
@@ -789,7 +774,7 @@ export default function CalculatorPage() {
                 <div className="bg-white rounded-xl border border-gray-200 p-4">
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Quick Reference — Material Rates</p>
                   <div className="space-y-1.5">
-                    {(['2ply_brown', '2ply_white', '3ply_brown', '3ply_white'] as Exclude<MaterialId, 'none'>[]).map(id => (
+                    {(['2ply_brown', '2ply_white', '3ply_brown', '3ply_white', '2ply_bflute', '3ply_bflute'] as Exclude<MaterialId, 'none'>[]).map(id => (
                       <div key={id} className="flex justify-between text-xs">
                         <span className="text-gray-600">{MATERIAL_LABELS[id]}</span>
                         <span className="text-gray-900 font-medium">Rs. {pricing.materials[id]}/in²</span>

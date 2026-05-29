@@ -2,10 +2,12 @@ import type { PricingConfig } from '../../lib/pricingTypes'
 
 export const defaultPricing: PricingConfig = {
   materials: {
-    '2ply_brown': 0.101,
-    '2ply_white': 0.140,
-    '3ply_brown': 0.135,
-    '3ply_white': 0.200,
+    '2ply_brown':  0.101,
+    '2ply_white':  0.140,
+    '3ply_brown':  0.135,
+    '3ply_white':  0.200,
+    '2ply_bflute': 0.080,
+    '3ply_bflute': 0.115,
   },
   boards: {
     '250gsm': 0.040,
