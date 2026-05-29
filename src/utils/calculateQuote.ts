@@ -8,13 +8,14 @@
 import type { QuoteInput, QuoteResult, PricingConfig } from '../lib/pricingTypes'
 
 export function calculateQuote(input: QuoteInput, pricing: PricingConfig): QuoteResult | null {
-  const { squareInchesPerUnit: sqIn, quantity } = input
+  const { length, width, quantity } = input
   const { materials, boards, addons, surcharges } = pricing
 
   // Guard — invalid inputs
-  if (!sqIn || sqIn <= 0 || !quantity || quantity <= 0) return null
+  if (!length || length <= 0 || !width || width <= 0 || !quantity || quantity <= 0) return null
 
   // ── Total sheet area ──────────────────────────────────────────────────────
+  const sqIn      = length * width    // in² per unit
   const totalArea = sqIn * quantity
 
   // ── Material cost ─────────────────────────────────────────────────────────

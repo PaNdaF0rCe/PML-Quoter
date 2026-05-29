@@ -72,7 +72,8 @@ export interface CustomerDetails {
 }
 
 export interface QuoteInput {
-  squareInchesPerUnit: number
+  length: number              // inches — squareInchesPerUnit = length × width
+  width: number               // inches
   quantity: number
   material: MaterialId
   board: BoardId

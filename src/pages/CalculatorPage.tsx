@@ -27,7 +27,8 @@ const defaultCustomer = (): CustomerDetails => ({
 })
 
 const defaultInput: QuoteInput = {
-  squareInchesPerUnit: 0,
+  length: 0,
+  width: 0,
   quantity: 0,
   material: '2ply_brown',
   board: 'none',
@@ -185,7 +186,7 @@ export default function CalculatorPage() {
     }
   }
 
-  const isValid = input.squareInchesPerUnit > 0 && input.quantity > 0
+  const isValid = input.length > 0 && input.width > 0 && input.quantity > 0
   const boardRequired = input.printing && input.board === 'none'
 
   const addonNote = (rate: number, unit: string) => `Rs. ${rate} per ${unit}`
@@ -228,7 +229,7 @@ export default function CalculatorPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6">
+      <main className="max-w-7xl mx-auto px-4 pt-6 pb-28 lg:pb-8">
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">{error}</div>
         )}
@@ -312,23 +313,36 @@ export default function CalculatorPage() {
             </Card>
 
             {/* Costing Inputs */}
-            <Card title="Costing Inputs">
-              <div className="grid grid-cols-2 gap-4">
+            <Card title="Dimensions & Quantity">
+              <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <Label htmlFor="sqIn">Square Inches per Unit</Label>
+                  <Label htmlFor="len">Length (in)</Label>
                   <Input
-                    id="sqIn"
+                    id="len"
                     type="number"
                     min={0}
                     step={0.5}
-                    value={input.squareInchesPerUnit || ''}
-                    onChange={e => setIn('squareInchesPerUnit', Math.max(0, Number(e.target.value)))}
-                    placeholder="e.g. 150"
+                    value={input.length || ''}
+                    onChange={e => setIn('length', Math.max(0, Number(e.target.value)))}
+                    placeholder="e.g. 15"
                   />
-                  {!input.squareInchesPerUnit && <p className="mt-1 text-xs text-red-600">Required</p>}
+                  {!input.length && <p className="mt-1 text-xs text-red-600">Required</p>}
                 </div>
                 <div>
-                  <Label htmlFor="qty">Quantity (units)</Label>
+                  <Label htmlFor="wid">Width (in)</Label>
+                  <Input
+                    id="wid"
+                    type="number"
+                    min={0}
+                    step={0.5}
+                    value={input.width || ''}
+                    onChange={e => setIn('width', Math.max(0, Number(e.target.value)))}
+                    placeholder="e.g. 10"
+                  />
+                  {!input.width && <p className="mt-1 text-xs text-red-600">Required</p>}
+                </div>
+                <div>
+                  <Label htmlFor="qty">Quantity</Label>
                   <Input
                     id="qty"
                     type="number"
@@ -341,9 +355,14 @@ export default function CalculatorPage() {
                   {!input.quantity && <p className="mt-1 text-xs text-red-600">Required</p>}
                 </div>
               </div>
-              {quote && (
+              {input.length > 0 && input.width > 0 && (
                 <p className="mt-3 text-xs text-gray-500">
-                  Total area: <strong>{quote.totalArea.toLocaleString()} in²</strong>
+                  Area per unit: <strong>{(input.length * input.width).toLocaleString()} in²</strong>
+                  {input.quantity > 0 && (
+                    <span className="ml-2 text-gray-400">
+                      · Total: {(input.length * input.width * input.quantity).toLocaleString()} in²
+                    </span>
+                  )}
                 </p>
               )}
             </Card>
@@ -738,6 +757,49 @@ export default function CalculatorPage() {
           </div>
         </div>
       </main>
+
+      {/* ── Mobile sticky bottom bar ── */}
+      {isValid && quote && (
+        <div className="lg:hidden fixed bottom-0 inset-x-0 z-30 bg-white border-t border-gray-200 shadow-2xl px-4 py-3">
+          <div className="flex items-center gap-3">
+            {/* Total */}
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-gray-500 leading-none">Total</p>
+              <p className="text-xl font-bold text-red-700 leading-tight">{fmtRs(quote.total)}</p>
+              <p className="text-xs text-gray-400 leading-none mt-0.5">{fmtRs(quote.perUnitPrice)}/unit</p>
+            </div>
+            {/* Save */}
+            <button
+              onClick={handleSave}
+              disabled={saving}
+              className="flex items-center gap-1.5 px-3 py-2 bg-red-700 text-white text-xs font-semibold rounded-lg hover:bg-red-800 transition-colors disabled:opacity-60 shrink-0"
+            >
+              {saving
+                ? <span className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full" />
+                : <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" /></svg>
+              }
+              {currentSavedId ? 'Update' : 'Save'}
+            </button>
+            {/* PDF */}
+            <button
+              onClick={handleDownloadPdf}
+              disabled={pdfLoading}
+              className="flex items-center gap-1.5 px-3 py-2 bg-gray-800 text-white text-xs font-semibold rounded-lg hover:bg-gray-900 transition-colors disabled:opacity-60 shrink-0"
+            >
+              {pdfLoading
+                ? <span className="animate-spin w-3 h-3 border border-white border-t-transparent rounded-full" />
+                : <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+              }
+              PDF
+            </button>
+          </div>
+          {savedMsg && (
+            <p className={`text-xs mt-1 text-center font-medium ${savedMsg.includes('failed') ? 'text-red-600' : 'text-green-600'}`}>
+              {savedMsg}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   )
 }

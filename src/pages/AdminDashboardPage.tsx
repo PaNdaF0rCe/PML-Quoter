@@ -159,7 +159,7 @@ export default function AdminDashboardPage() {
 
         {/* ── 1. Material Rates ── */}
         <SectionCard title="Material Rates (Rs per in²)">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <RateField
               label="2 Ply Brown"
               value={local.materials['2ply_brown']}
@@ -185,7 +185,7 @@ export default function AdminDashboardPage() {
 
         {/* ── 2. Board Rates ── */}
         <SectionCard title="Board Rates (Rs per in²)">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <RateField
               label="250 GSM Board"
               value={local.boards['250gsm']}
@@ -202,7 +202,7 @@ export default function AdminDashboardPage() {
 
         {/* ── 3. Add-on Rates ── */}
         <SectionCard title="Add-on Rates">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <RateField
               label="Printing"
               hint="Rs per colour per unit"
@@ -248,7 +248,7 @@ export default function AdminDashboardPage() {
           </div>
           <div className="mt-4 pt-4 border-t border-gray-100">
             <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">External Laminate Rates (Rs per in²)</p>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <RateField
                 label="Hot Laminate"
                 step={0.001}
@@ -293,7 +293,7 @@ export default function AdminDashboardPage() {
 
         {/* ── 5. Company / PDF Settings ── */}
         <SectionCard title="Company / PDF Settings">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextField
               label="Company Name"
               value={local.company.companyName}

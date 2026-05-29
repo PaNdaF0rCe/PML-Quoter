@@ -142,19 +142,22 @@ export async function generateQuotationPdf(
 
   const jobRows: [string, string][] = [
     ['Product / Job', customer.quotationTitle || 'N/A'],
-    ['Square inches per unit', `${fmtNum(input.squareInchesPerUnit)} in²`],
+    ['Length', `${fmtNum(input.length)} in`],
+    ['Width', `${fmtNum(input.width)} in`],
     ['Quantity', `${fmtNum(input.quantity)} units`],
-    ['Total area', `${fmtNum(result.totalArea)} in²`],
     ['Material', materialLabel],
-    ['Board', BOARD_LABELS[input.board]],
-    ['Printing', input.printing ? `Yes — ${input.colourCount} colour${input.colourCount > 1 ? 's' : ''}${input.colourCount === 4 ? ' (CMYK)' : ''}` : 'No'],
-    ['Varnish', input.varnish ? 'Yes' : 'No'],
-    ['Die Cutting', input.dieCutting ? 'Yes' : 'No'],
-    ['E-Flute Lamination', input.eFluteLamination ? 'Yes' : 'No'],
-    ['P&D + Side Pasting', input.pasting ? 'Yes' : 'No'],
-    ['Packing & Delivery', input.packingDelivery ? 'Yes' : 'No'],
-    ['External Laminate', laminateLabel],
-    ['Foiling', result.foilingCost > 0 ? fmtRs(result.foilingCost) : 'No'],
+    ...(input.board !== 'none' ? [['Board', BOARD_LABELS[input.board]] as [string, string]] : []),
+    ...(input.printing ? [[
+      'Printing',
+      `${input.colourCount} colour${input.colourCount > 1 ? 's' : ''}${input.colourCount === 4 ? ' (CMYK)' : ''}`,
+    ] as [string, string]] : []),
+    ...(input.varnish ? [['Varnish', 'Yes'] as [string, string]] : []),
+    ...(input.dieCutting ? [['Die Cutting', 'Yes'] as [string, string]] : []),
+    ...(input.eFluteLamination ? [['E-Flute Lamination', 'Yes'] as [string, string]] : []),
+    ...(input.pasting ? [['P&D + Side Pasting', 'Yes'] as [string, string]] : []),
+    ...(input.packingDelivery ? [['Packing & Delivery', 'Yes'] as [string, string]] : []),
+    ...(input.laminateType !== 'none' ? [['External Laminate', laminateLabel] as [string, string]] : []),
+    ...(result.foilingCost > 0 ? [['Foiling', fmtRs(result.foilingCost)] as [string, string]] : []),
   ]
 
   autoTable(doc, {
@@ -171,7 +174,7 @@ export async function generateQuotationPdf(
   y = (doc as any).lastAutoTable.finalY + 6
 
   // ── COST BREAKDOWN ───────────────────────────────────────────────────────────
-  const sqIn   = input.squareInchesPerUnit
+  const sqIn   = input.length * input.width
   const qty    = input.quantity
   const qtyStr = fmtNum(qty)
   const sqInStr = fmtNum(sqIn)
