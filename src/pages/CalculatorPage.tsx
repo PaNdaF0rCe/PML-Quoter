@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { usePricing } from '../context/PricingContext'
-const logo    = '/logo.webp'
-const logoUrl = '/logo.webp'
+const logo = '/logo.webp'
 import Card from '../components/ui/Card'
 import Label from '../components/ui/Label'
 import Input from '../components/ui/Input'
@@ -108,7 +107,7 @@ export default function CalculatorPage() {
     if (!quote) return
     setPdfLoading(true)
     try {
-      await generateQuotationPdf(customer, input, quote, pricing, logoUrl)
+      await generateQuotationPdf(customer, input, quote, pricing)
     } catch (e) {
       console.error('PDF generation failed:', e)
       alert('PDF generation failed. Please try again.')

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import logo from '../assets/logo.webp'
+const logo = '/logo.webp'
 import Card from '../components/ui/Card'
 import ImageUploadAnalyzer from '../components/analysis/ImageUploadAnalyzer'
 import DimensionInputPanel from '../components/analysis/DimensionInputPanel'

@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import Input from '../components/ui/Input'
 import Button from '../components/ui/Button'
 import Label from '../components/ui/Label'
-import logo from '../assets/logo.webp'
+const logo = '/logo.webp'
 
 export default function AdminLoginPage() {
   const { login, user } = useAuth()

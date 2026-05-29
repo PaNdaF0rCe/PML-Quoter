@@ -73,14 +73,13 @@ export async function generateQuotationPdf(
   input: QuoteInput,
   result: QuoteResult,
   pricing: PricingConfig,
-  logoUrl: string,
 ): Promise<void> {
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
   const co = pricing.company
 
-  // Load logo
-  const logoB64 = await loadLogoBase64(logoUrl)
+  // Load logo from public folder — always /logo.webp
+  const logoB64 = await loadLogoBase64('/logo.webp')
 
   // ── HEADER ──────────────────────────────────────────────────────────────────
   let y = 15
