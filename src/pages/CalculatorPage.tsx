@@ -336,15 +336,15 @@ export default function CalculatorPage() {
                     </span>
                   </label>
                   {input.printing && (
-                    <div className="px-4 pb-3">
+                    <div className="px-4 pb-3 space-y-2">
                       <Label>Number of colours</Label>
-                      <div className="grid grid-cols-4 gap-2 mt-1">
+                      <div className="flex flex-wrap items-center gap-2">
                         {COLOUR_OPTIONS.map(opt => (
                           <button
                             key={opt.value}
                             type="button"
                             onClick={() => setIn('colourCount', opt.value)}
-                            className={`py-2 rounded-lg border text-xs font-medium transition-colors ${
+                            className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors whitespace-nowrap ${
                               input.colourCount === opt.value
                                 ? 'bg-red-700 border-red-700 text-white'
                                 : 'bg-white border-gray-300 text-gray-700 hover:border-red-400'
@@ -353,6 +353,37 @@ export default function CalculatorPage() {
                             {opt.label}
                           </button>
                         ))}
+                        {/* Custom colour count */}
+                        <div className="flex items-center gap-1.5 ml-1">
+                          <span className={`text-xs font-medium ${
+                            !COLOUR_OPTIONS.some(o => o.value === input.colourCount)
+                              ? 'text-red-700'
+                              : 'text-gray-400'
+                          }`}>
+                            Other:
+                          </span>
+                          <input
+                            type="number"
+                            min={1}
+                            max={99}
+                            step={1}
+                            placeholder="5+"
+                            value={
+                              COLOUR_OPTIONS.some(o => o.value === input.colourCount)
+                                ? ''
+                                : input.colourCount
+                            }
+                            onChange={e => {
+                              const v = parseInt(e.target.value, 10)
+                              if (!isNaN(v) && v > 0) setIn('colourCount', v)
+                            }}
+                            className={`w-16 rounded-lg border px-2 py-1.5 text-xs text-center focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-colors ${
+                              !COLOUR_OPTIONS.some(o => o.value === input.colourCount)
+                                ? 'border-red-700 bg-red-50 text-red-700 font-medium'
+                                : 'border-gray-300 text-gray-600'
+                            }`}
+                          />
+                        </div>
                       </div>
                     </div>
                   )}
