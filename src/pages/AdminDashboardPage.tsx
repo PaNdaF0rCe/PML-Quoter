@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 const logo = '/logo.webp'
 import { usePricing } from '../context/PricingContext'
 import { defaultPricing } from '../data/defaults/pricing'
-import type { PricingConfig } from '../lib/pricingTypes'
+import type { PricingConfig, WilkinsSpenceRates } from '../lib/pricingTypes'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import SeedButton from '../components/admin/SeedButton'
@@ -122,6 +122,10 @@ export default function AdminDashboardPage() {
 
   const setCompany = (key: keyof typeof local.company, v: string) =>
     setLocal(p => ({ ...p, company: { ...p.company, [key]: v } }))
+
+  const defaultWS = defaultPricing.wilkinsSpence!
+  const setWS = (key: keyof WilkinsSpenceRates, v: number) =>
+    setLocal(p => ({ ...p, wilkinsSpence: { ...(p.wilkinsSpence ?? defaultWS), [key]: v } }))
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -301,7 +305,37 @@ export default function AdminDashboardPage() {
           </div>
         </SectionCard>
 
-        {/* ── 5. Company / PDF Settings ── */}
+        {/* ── 5. Wilkins Spence Rates ── */}
+        <SectionCard title="Wilkins Spence — Reel Rates (Rs per mm²)">
+          <p className="text-sm text-gray-500 mb-4">
+            Rates applied per mm² of sheet area for each reel size.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <RateField
+              label="31 mm Reel"
+              hint="Rs per mm²"
+              step={0.000001}
+              value={local.wilkinsSpence?.reel31 ?? defaultWS.reel31}
+              onChange={v => setWS('reel31', v)}
+            />
+            <RateField
+              label="35 mm Reel"
+              hint="Rs per mm²"
+              step={0.000001}
+              value={local.wilkinsSpence?.reel35 ?? defaultWS.reel35}
+              onChange={v => setWS('reel35', v)}
+            />
+            <RateField
+              label="39 mm Reel"
+              hint="Rs per mm²"
+              step={0.000001}
+              value={local.wilkinsSpence?.reel39 ?? defaultWS.reel39}
+              onChange={v => setWS('reel39', v)}
+            />
+          </div>
+        </SectionCard>
+
+        {/* ── 6. Company / PDF Settings ── */}
         <SectionCard title="Company / PDF Settings">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <TextField

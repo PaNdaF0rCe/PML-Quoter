@@ -27,6 +27,11 @@ export const defaultPricing: PricingConfig = {
   surcharges: {
     twoPlyPercentage: 15,
   },
+  wilkinsSpence: {
+    reel31: 0.0005,   // Rs per mm² — adjust in admin
+    reel35: 0.0006,
+    reel39: 0.0007,
+  },
   company: {
     companyName:  'Pack Me Lanka',
     legalName:    'Pack Me Lanka (PVT) LTD',

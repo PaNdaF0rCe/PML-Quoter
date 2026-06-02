@@ -6,6 +6,7 @@ import CalculatorPage from './pages/CalculatorPage'
 import AdminLoginPage from './pages/AdminLoginPage'
 import AdminDashboardPage from './pages/AdminDashboardPage'
 import ProtectedRoute from './components/ui/ProtectedRoute'
+import WilkinsSpencePage from './pages/WilkinsSpencePage'
 
 function AnalysisPlaceholder() {
   return (
@@ -36,6 +37,7 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/calculator" element={<CalculatorPage />} />
             <Route path="/calculator/:id" element={<CalculatorPage />} />
+            <Route path="/wilkins-spence" element={<WilkinsSpencePage />} />
             <Route path="/analysis" element={<AnalysisPlaceholder />} />
             <Route path="/admin/login" element={<AdminLoginPage />} />
             <Route

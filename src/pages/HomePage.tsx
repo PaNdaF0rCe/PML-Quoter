@@ -88,15 +88,23 @@ export default function HomePage() {
             <h1 className="text-2xl font-bold text-gray-900">Quotations</h1>
             <p className="text-sm text-gray-500 mt-0.5">All saved quotations — click any row to open</p>
           </div>
-          <button
-            onClick={() => navigate('/calculator')}
-            className="flex items-center gap-2 px-5 py-2.5 bg-red-700 text-white text-sm font-semibold rounded-xl hover:bg-red-800 transition-colors shadow-sm"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-            </svg>
-            New Quotation
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate('/wilkins-spence')}
+              className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
+            >
+              Wilkins Spence Quote
+            </button>
+            <button
+              onClick={() => navigate('/calculator')}
+              className="flex items-center gap-2 px-5 py-2.5 bg-red-700 text-white text-sm font-semibold rounded-xl hover:bg-red-800 transition-colors shadow-sm"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              </svg>
+              New Quotation
+            </button>
+          </div>
         </div>
 
         {/* ── States ── */}

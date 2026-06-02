@@ -37,6 +37,12 @@ export interface Surcharges {
   twoPlyPercentage: number   // % added to subtotal when material is 2-ply only (no board or add-ons)
 }
 
+export interface WilkinsSpenceRates {
+  reel31: number   // Rs per mm²
+  reel35: number
+  reel39: number
+}
+
 export interface CompanySettings {
   companyName: string
   legalName: string
@@ -57,6 +63,7 @@ export interface PricingConfig {
   addons: AddOnRates
   surcharges: Surcharges
   company: CompanySettings
+  wilkinsSpence?: WilkinsSpenceRates
 }
 
 // ─── Quote inputs ─────────────────────────────────────────────────────────────
