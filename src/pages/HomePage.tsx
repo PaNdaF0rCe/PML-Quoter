@@ -185,7 +185,7 @@ export default function HomePage() {
                           </span>
                         </td>
                         <td className="px-4 py-3 text-right font-semibold text-gray-900 whitespace-nowrap">
-                          {fmtRs(q.result.total)}
+                          {q.result?.total != null ? fmtRs(q.result.total) : '—'}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <button
@@ -232,7 +232,7 @@ export default function HomePage() {
                         <p className="text-xs text-gray-400 font-mono mt-1">{q.customer.quotationNumber}</p>
                       </div>
                       <div className="text-right shrink-0">
-                        <p className="font-bold text-gray-900">{fmtRs(q.result.total)}</p>
+                        <p className="font-bold text-gray-900">{q.result?.total != null ? fmtRs(q.result.total) : '—'}</p>
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${
                           valid ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
                         }`}>

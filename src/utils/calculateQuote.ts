@@ -138,6 +138,7 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
 // ─── Formatting ───────────────────────────────────────────────────────────────
 
 export function fmtRs(n: number): string {
+  if (n == null || isNaN(n)) return 'Rs. —'
   return `Rs. ${n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
