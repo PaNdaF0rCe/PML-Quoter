@@ -12,6 +12,7 @@ export const defaultPricing: PricingConfig = {
   boards: {
     '250gsm': 0.040,
     '300gsm': 0.048,
+    'ivory':  0.055,
   },
   addons: {
     printingPerColour:      2,

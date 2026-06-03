@@ -210,6 +210,11 @@ export default function AdminDashboardPage() {
               value={local.boards['300gsm']}
               onChange={v => setBoard('300gsm', v)}
             />
+            <RateField
+              label="Ivory Board"
+              value={local.boards['ivory']}
+              onChange={v => setBoard('ivory', v)}
+            />
           </div>
           <p className="mt-3 text-xs text-gray-400">"None" option has no cost and requires no rate.</p>
         </SectionCard>

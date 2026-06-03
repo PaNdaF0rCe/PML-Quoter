@@ -92,23 +92,23 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
   // Manual lump-sum entry — passed through directly.
   const foilingCost = input.foilingPerUnit > 0 ? input.foilingPerUnit * quantity : 0
 
-  // ── Base total (before additional charges) ───────────────────────────────
+  // ── Base total (before price adjustments) ────────────────────────────────
   const baseTotal = subtotal + twoPlySurcharge + externalLaminateCost + foilingCost
 
-  // ── Additional charges (each stacks on the running total) ────────────────
-  const c1Pct = input.charge1Pct ?? 0
-  const c2Pct = input.charge2Pct ?? 0
-  const c3Pct = input.charge3Pct ?? 0
+  // ── Price adjustments (% first, then flat Rs, then round) ────────────────
+  const adjPct = input.adjustmentPct ?? 0
+  const adjRs  = input.adjustmentRs  ?? 0
+  const roundTo = input.roundTo      ?? 0
 
-  const after1        = c1Pct > 0 ? baseTotal * (1 + c1Pct / 100) : baseTotal
-  const charge1Amount = after1 - baseTotal
-  const after2        = c2Pct > 0 ? after1 * (1 + c2Pct / 100) : after1
-  const charge2Amount = after2 - after1
-  const after3        = c3Pct > 0 ? after2 * (1 + c3Pct / 100) : after2
-  const charge3Amount = after3 - after2
+  const afterPct           = adjPct !== 0 ? baseTotal * (1 + adjPct / 100) : baseTotal
+  const adjustmentPctAmount = afterPct - baseTotal
+  const afterRs            = afterPct + adjRs
+  const adjustmentRsAmount  = adjRs
 
-  // ── Grand total & per-unit ────────────────────────────────────────────────
-  const total        = after3
+  // Round to nearest N (0 = disabled)
+  const total = roundTo > 0 ? Math.round(afterRs / roundTo) * roundTo : afterRs
+
+  // ── Per-unit price ────────────────────────────────────────────────────────
   const perUnitPrice = total / quantity
 
   return {
@@ -127,9 +127,8 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     externalLaminateCost,
     foilingCost,
     baseTotal,
-    charge1Amount,
-    charge2Amount,
-    charge3Amount,
+    adjustmentPctAmount,
+    adjustmentRsAmount,
     total,
     perUnitPrice,
     isTwoPly,

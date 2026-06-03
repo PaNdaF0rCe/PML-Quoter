@@ -1,7 +1,7 @@
 // ─── Material / board / laminate IDs ─────────────────────────────────────────
 
 export type MaterialId = '2ply_brown' | '2ply_white' | '3ply_brown' | '3ply_white' | '2ply_bflute' | '3ply_bflute' | 'none'
-export type BoardId    = 'none' | '250gsm' | '300gsm'
+export type BoardId    = 'none' | '250gsm' | '300gsm' | 'ivory'
 export type LaminateType = 'none' | 'hot' | 'cold' | 'uv'
 
 // ─── Pricing config (stored in Firestore, editable in admin) ─────────────────
@@ -19,6 +19,7 @@ export interface MaterialRates {
 export interface BoardRates {
   '250gsm': number       // Rs per in²
   '300gsm': number
+  'ivory':  number
 }
 
 export interface AddOnRates {
@@ -96,10 +97,10 @@ export interface QuoteInput {
   // ── external costs ──
   laminateType: LaminateType  // external laminate selection
   foilingPerUnit: number      // foiling cost per unit (Rs); 0 = not selected
-  // ── additional charges (internal markup — not shown in customer PDF) ──
-  charge1Pct: number          // additional charge 1 (%)
-  charge2Pct: number          // additional charge 2 (%)
-  charge3Pct: number          // additional charge 3 (%)
+  // ── price adjustment (internal — not shown in customer PDF) ──
+  adjustmentPct: number   // % to add/subtract (positive = add, negative = discount)
+  adjustmentRs:  number   // flat Rs to add/subtract (positive = add, negative = reduce)
+  roundTo:       number   // round final total to nearest N (0 = no rounding)
 }
 
 // ─── Quote result ─────────────────────────────────────────────────────────────
@@ -121,11 +122,10 @@ export interface QuoteResult {
   externalLaminateCost: number
   foilingCost: number
   // totals
-  baseTotal: number         // total before additional charges
-  charge1Amount: number
-  charge2Amount: number
-  charge3Amount: number
-  total: number             // final total after all charges
+  baseTotal: number             // before price adjustments
+  adjustmentPctAmount: number   // Rs value of % adjustment (can be negative)
+  adjustmentRsAmount:  number   // flat adjustment (same sign as input)
+  total: number                 // final total after adjustments + rounding
   perUnitPrice: number
   isTwoPly: boolean
 }
@@ -156,6 +156,7 @@ export const BOARD_LABELS: Record<BoardId, string> = {
   none:    'None',
   '250gsm': '250 GSM',
   '300gsm': '300 GSM',
+  'ivory':  'Ivory Board',
 }
 
 export const LAMINATE_LABELS: Record<LaminateType, string> = {

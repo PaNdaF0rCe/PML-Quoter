@@ -40,9 +40,9 @@ const defaultInput: QuoteInput = {
   pasting: false,
   laminateType: 'none',
   foilingPerUnit: 0,
-  charge1Pct: 0,
-  charge2Pct: 0,
-  charge3Pct: 0,
+  adjustmentPct: 0,
+  adjustmentRs: 0,
+  roundTo: 0,
 }
 
 // ─── Tiny helpers ─────────────────────────────────────────────────────────────
@@ -635,40 +635,77 @@ export default function CalculatorPage() {
               </div>
             </Card>
 
-            {/* Additional Charges */}
-            <Card title="Additional Charges">
-              <p className="text-xs text-gray-400 mb-3">
-                Internal markup percentages — applied sequentially to the running total.
-                Not shown on the customer PDF.
+            {/* Price Adjustment */}
+            <Card title="Price Adjustment">
+              <p className="text-xs text-gray-400 mb-4">
+                Fine-tune the final price before quoting. Not shown on the customer PDF.
               </p>
-              <div className="space-y-3">
-                {([
-                  { label: 'Charge 1', pctKey: 'charge1Pct' as const, amount: quote?.charge1Amount ?? 0 },
-                  { label: 'Charge 2', pctKey: 'charge2Pct' as const, amount: quote?.charge2Amount ?? 0 },
-                  { label: 'Charge 3', pctKey: 'charge3Pct' as const, amount: quote?.charge3Amount ?? 0 },
-                ]).map(({ label, pctKey, amount }) => (
-                  <div key={pctKey} className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600 w-16 shrink-0">{label}</span>
-                    <div className="flex items-center gap-1.5">
-                      <Input
-                        type="number"
-                        min={0}
-                        max={100}
-                        step={0.5}
-                        value={input[pctKey] || ''}
-                        onChange={e => setIn(pctKey, Math.max(0, Number(e.target.value)))}
-                        placeholder="0"
-                        className="w-20 text-center"
-                      />
-                      <span className="text-sm text-gray-500">%</span>
-                    </div>
-                    {(input[pctKey] as number) > 0 && isValid && (
-                      <span className="text-sm text-gray-500 tabular-nums ml-1">
-                        + {fmtRs(amount)}
+              <div className="space-y-4">
+
+                {/* Percentage tweak */}
+                <div>
+                  <Label>Percentage Adjustment</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      type="number"
+                      step={0.5}
+                      value={input.adjustmentPct || ''}
+                      onChange={e => setIn('adjustmentPct', Number(e.target.value))}
+                      placeholder="0"
+                      className="w-24 text-center"
+                    />
+                    <span className="text-sm text-gray-500">%</span>
+                    {input.adjustmentPct !== 0 && isValid && quote && (
+                      <span className={`text-sm tabular-nums ${quote.adjustmentPctAmount >= 0 ? 'text-gray-600' : 'text-red-600'}`}>
+                        {quote.adjustmentPctAmount >= 0 ? '+' : ''}{fmtRs(quote.adjustmentPctAmount)}
                       </span>
                     )}
                   </div>
-                ))}
+                  <p className="mt-1 text-xs text-gray-400">Positive = mark up · Negative = discount</p>
+                </div>
+
+                {/* Flat Rs tweak */}
+                <div>
+                  <Label>Flat Adjustment (Rs)</Label>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Input
+                      type="number"
+                      step={100}
+                      value={input.adjustmentRs || ''}
+                      onChange={e => setIn('adjustmentRs', Number(e.target.value))}
+                      placeholder="0"
+                      className="w-36"
+                    />
+                    {input.adjustmentRs !== 0 && isValid && (
+                      <span className={`text-sm tabular-nums ${input.adjustmentRs >= 0 ? 'text-gray-600' : 'text-red-600'}`}>
+                        {input.adjustmentRs >= 0 ? '+' : ''}{fmtRs(input.adjustmentRs)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-xs text-gray-400">Positive = add · Negative = subtract</p>
+                </div>
+
+                {/* Round to nearest */}
+                <div>
+                  <Label>Round to Nearest</Label>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {[0, 100, 500, 1000, 5000, 10000].map(n => (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => setIn('roundTo', n)}
+                        className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
+                          input.roundTo === n
+                            ? 'bg-red-700 border-red-700 text-white'
+                            : 'bg-white border-gray-300 text-gray-700 hover:border-red-400'
+                        }`}
+                      >
+                        {n === 0 ? 'Off' : n.toLocaleString()}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
               </div>
             </Card>
 
@@ -737,22 +774,28 @@ export default function CalculatorPage() {
                         )}
                       </div>
                     )}
-                    {/* Additional charges */}
-                    {(quote.charge1Amount > 0 || quote.charge2Amount > 0 || quote.charge3Amount > 0) && (
+                    {/* Price adjustments */}
+                    {(quote.adjustmentPctAmount !== 0 || quote.adjustmentRsAmount !== 0 || input.roundTo > 0) && (
                       <>
                         <div className="border-t border-dashed border-gray-200 pt-2">
                           <CostRow label="Base Total" value={fmtRs(quote.baseTotal)} highlight />
                         </div>
                         <div className="border-t border-dashed border-gray-200 pt-2 space-y-0.5">
-                          <p className="text-xs text-gray-400 uppercase tracking-wide pt-1 pb-0.5">Additional Charges</p>
-                          {quote.charge1Amount > 0 && (
-                            <CostRow label={`Charge 1 (${input.charge1Pct}%)`} value={fmtRs(quote.charge1Amount)} />
+                          <p className="text-xs text-gray-400 uppercase tracking-wide pt-1 pb-0.5">Price Adjustment</p>
+                          {quote.adjustmentPctAmount !== 0 && (
+                            <CostRow
+                              label={`${input.adjustmentPct > 0 ? '+' : ''}${input.adjustmentPct}%`}
+                              value={(quote.adjustmentPctAmount >= 0 ? '+' : '') + fmtRs(quote.adjustmentPctAmount)}
+                            />
                           )}
-                          {quote.charge2Amount > 0 && (
-                            <CostRow label={`Charge 2 (${input.charge2Pct}%)`} value={fmtRs(quote.charge2Amount)} />
+                          {quote.adjustmentRsAmount !== 0 && (
+                            <CostRow
+                              label="Flat adjustment"
+                              value={(quote.adjustmentRsAmount >= 0 ? '+' : '') + fmtRs(quote.adjustmentRsAmount)}
+                            />
                           )}
-                          {quote.charge3Amount > 0 && (
-                            <CostRow label={`Charge 3 (${input.charge3Pct}%)`} value={fmtRs(quote.charge3Amount)} />
+                          {input.roundTo > 0 && (
+                            <CostRow label={`Rounded to ${input.roundTo.toLocaleString()}`} value="" muted />
                           )}
                         </div>
                       </>
