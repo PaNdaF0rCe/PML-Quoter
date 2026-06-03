@@ -689,18 +689,22 @@ export default function CalculatorPage() {
                 <div>
                   <Label>Round to Nearest</Label>
                   <div className="flex flex-wrap gap-2 mt-1">
-                    {[0, 100, 500, 1000, 5000, 10000].map(n => (
+                    {[
+                      { value: 0, label: 'Off' },
+                      { value: 1, label: 'Whole number' },
+                      { value: 5, label: 'Nearest 5' },
+                    ].map(({ value, label }) => (
                       <button
-                        key={n}
+                        key={value}
                         type="button"
-                        onClick={() => setIn('roundTo', n)}
+                        onClick={() => setIn('roundTo', value)}
                         className={`px-3 py-1.5 rounded-lg border text-xs font-medium transition-colors ${
-                          input.roundTo === n
+                          input.roundTo === value
                             ? 'bg-red-700 border-red-700 text-white'
                             : 'bg-white border-gray-300 text-gray-700 hover:border-red-400'
                         }`}
                       >
-                        {n === 0 ? 'Off' : n.toLocaleString()}
+                        {label}
                       </button>
                     ))}
                   </div>
@@ -795,7 +799,11 @@ export default function CalculatorPage() {
                             />
                           )}
                           {input.roundTo > 0 && (
-                            <CostRow label={`Rounded to ${input.roundTo.toLocaleString()}`} value="" muted />
+                            <CostRow
+                              label={input.roundTo === 1 ? 'Rounded to whole number' : `Rounded to nearest ${input.roundTo}`}
+                              value=""
+                              muted
+                            />
                           )}
                         </div>
                       </>
