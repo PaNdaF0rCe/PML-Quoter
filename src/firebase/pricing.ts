@@ -11,7 +11,16 @@ export async function fetchPricing(): Promise<PricingConfig> {
     const data = snap.data() as PricingConfig
     // Basic structural validation — fall back to defaults if the doc is from old schema
     if (data.materials && data.boards && data.addons && data.surcharges && data.company) {
-      return data
+      // Deep-merge with defaults so any newly-added fields always have a fallback value.
+      // This prevents "undefined" rates when the Firestore doc pre-dates a schema addition.
+      return {
+        materials:    { ...defaultPricing.materials,    ...data.materials },
+        boards:       { ...defaultPricing.boards,       ...data.boards },
+        addons:       { ...defaultPricing.addons,       ...data.addons },
+        surcharges:   { ...defaultPricing.surcharges,   ...data.surcharges },
+        company:      { ...defaultPricing.company,      ...data.company },
+        wilkinsSpence: data.wilkinsSpence ?? defaultPricing.wilkinsSpence,
+      }
     }
   }
   return defaultPricing

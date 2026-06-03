@@ -649,13 +649,13 @@ export default function CalculatorPage() {
                     <Input
                       type="number"
                       step={0.5}
-                      value={input.adjustmentPct || ''}
+                      value={input.adjustmentPct ?? ''}
                       onChange={e => setIn('adjustmentPct', Number(e.target.value))}
                       placeholder="0"
                       className="w-24 text-center"
                     />
                     <span className="text-sm text-gray-500">%</span>
-                    {input.adjustmentPct !== 0 && isValid && quote && (
+                    {(input.adjustmentPct ?? 0) !== 0 && isValid && quote && (
                       <span className={`text-sm tabular-nums ${quote.adjustmentPctAmount >= 0 ? 'text-gray-600' : 'text-red-600'}`}>
                         {quote.adjustmentPctAmount >= 0 ? '+' : ''}{fmtRs(quote.adjustmentPctAmount)}
                       </span>
@@ -671,14 +671,14 @@ export default function CalculatorPage() {
                     <Input
                       type="number"
                       step={100}
-                      value={input.adjustmentRs || ''}
+                      value={input.adjustmentRs ?? ''}
                       onChange={e => setIn('adjustmentRs', Number(e.target.value))}
                       placeholder="0"
                       className="w-36"
                     />
-                    {input.adjustmentRs !== 0 && isValid && (
-                      <span className={`text-sm tabular-nums ${input.adjustmentRs >= 0 ? 'text-gray-600' : 'text-red-600'}`}>
-                        {input.adjustmentRs >= 0 ? '+' : ''}{fmtRs(input.adjustmentRs)}
+                    {(input.adjustmentRs ?? 0) !== 0 && isValid && (
+                      <span className={`text-sm tabular-nums ${(input.adjustmentRs ?? 0) >= 0 ? 'text-gray-600' : 'text-red-600'}`}>
+                        {(input.adjustmentRs ?? 0) >= 0 ? '+' : ''}{fmtRs(input.adjustmentRs ?? 0)}
                       </span>
                     )}
                   </div>
@@ -788,7 +788,7 @@ export default function CalculatorPage() {
                           <p className="text-xs text-gray-400 uppercase tracking-wide pt-1 pb-0.5">Price Adjustment</p>
                           {quote.adjustmentPctAmount !== 0 && (
                             <CostRow
-                              label={`${input.adjustmentPct > 0 ? '+' : ''}${input.adjustmentPct}%`}
+                              label={`${(input.adjustmentPct ?? 0) > 0 ? '+' : ''}${input.adjustmentPct ?? 0}%`}
                               value={(quote.adjustmentPctAmount >= 0 ? '+' : '') + fmtRs(quote.adjustmentPctAmount)}
                             />
                           )}
