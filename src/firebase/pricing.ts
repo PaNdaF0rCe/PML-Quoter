@@ -22,6 +22,7 @@ export async function fetchPricing(): Promise<PricingConfig> {
         },
         addons:       { ...defaultPricing.addons,       ...data.addons },
         surcharges:   { ...defaultPricing.surcharges,   ...data.surcharges },
+        taxes:        { ...defaultPricing.taxes,        ...data.taxes },
         company:      { ...defaultPricing.company,      ...data.company },
         wilkinsSpence: data.wilkinsSpence ?? defaultPricing.wilkinsSpence,
       }

@@ -28,6 +28,10 @@ export const defaultPricing: PricingConfig = {
   surcharges: {
     twoPlyPercentage: 15,
   },
+  taxes: {
+    ssclPercentage: 2.125,
+    vatPercentage:  18,
+  },
   wilkinsSpence: {
     reel31: 0.0005,   // Rs per mm² — adjust in admin
     reel35: 0.0006,

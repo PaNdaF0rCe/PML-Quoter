@@ -296,19 +296,59 @@ export async function generateQuotationPdf(
   sf(doc, 14, 'bold', RED)
   doc.text(fmtRs(result.perUnitPrice), PW - MR - 5, y + 13, { align: 'right' })
 
-  // Total cost
+  // Total cost (production only)
   sf(doc, 8, 'normal', GREY)
-  doc.text('TOTAL COST', ML + 6, y + 28)
+  doc.text('PRODUCTION COST', ML + 6, y + 28)
   sf(doc, 14, 'bold', RED)
   doc.text(fmtRs(result.total), PW - MR - 5, y + 28, { align: 'right' })
 
   // per unit label under unit price
   sf(doc, 7, 'normal', GREY)
   doc.text('per unit', PW - MR - 5, y + 18, { align: 'right' })
-  // "total order value" label under total
-  doc.text('total order value', PW - MR - 5, y + 33, { align: 'right' })
+  doc.text('excl. taxes', PW - MR - 5, y + 33, { align: 'right' })
 
-  y += cardH + 8
+  y += cardH + 6
+
+  // ── Tax breakdown ──────────────────────────────────────────────────────────
+  y = ensureSpace(doc, y, 36)
+  y = sectionBar(doc, y, 'TAX BREAKDOWN')
+
+  const taxRows: [string, string][] = [
+    [`SSCL (${result.ssclPercentage}%)`,  fmtRs(result.ssclAmount)],
+    [`VAT (${result.vatPercentage}%)`,    fmtRs(result.vatAmount)],
+  ]
+  const taxBgH = taxRows.length * 8 + 14
+  doc.setFillColor(249, 250, 251)
+  doc.roundedRect(ML, y, CW, taxBgH, 2, 2, 'F')
+  doc.setDrawColor(229, 231, 235); doc.setLineWidth(0.3)
+  doc.roundedRect(ML, y, CW, taxBgH, 2, 2, 'S')
+
+  let ty = y + 7
+  for (const [label, val] of taxRows) {
+    sf(doc, 8, 'normal', GREY);  doc.text(label, ML + 5, ty)
+    sf(doc, 8, 'normal', DARK);  doc.text(val, PW - MR - 5, ty, { align: 'right' })
+    ty += 8
+  }
+
+  // Note: figures are production cost only
+  sf(doc, 7, 'italic', [120, 120, 120] as [number,number,number])
+  doc.text('* Production cost figures above do not include SSCL or VAT.', ML, ty + 3)
+
+  y = ty + 10
+
+  // Grand total card
+  y = ensureSpace(doc, y, 28)
+  const gtH = 22
+  doc.setFillColor(254, 242, 242)
+  doc.roundedRect(ML, y, CW, gtH, 3, 3, 'F')
+  doc.setDrawColor(...RED); doc.setLineWidth(0.6)
+  doc.roundedRect(ML, y, CW, gtH, 3, 3, 'S')
+
+  sf(doc, 8, 'normal', GREY);  doc.text('GRAND TOTAL (incl. SSCL & VAT)', ML + 6, y + 9)
+  sf(doc, 14, 'bold', RED);    doc.text(fmtRs(result.grandTotal), PW - MR - 5, y + 9, { align: 'right' })
+  sf(doc, 7, 'normal', GREY);  doc.text(`${fmtRs(result.grandTotalPerUnit)} per unit`, PW - MR - 5, y + 17, { align: 'right' })
+
+  y += gtH + 8
 
   // ═══════════════════════════════════════════════════════════════════════════
   // 5.  NOTES & TERMS

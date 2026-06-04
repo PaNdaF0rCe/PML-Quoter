@@ -50,6 +50,11 @@ export interface Surcharges {
   twoPlyPercentage: number   // % added to subtotal when material is 2-ply only (no board or add-ons)
 }
 
+export interface TaxRates {
+  ssclPercentage: number   // Social Security Contribution Levy (default 2.125%)
+  vatPercentage:  number   // Value Added Tax (default 18%)
+}
+
 export interface WilkinsSpenceRates {
   reel31: number   // Rs per mm²
   reel35: number
@@ -75,6 +80,7 @@ export interface PricingConfig {
   boards: BoardRates
   addons: AddOnRates
   surcharges: Surcharges
+  taxes: TaxRates
   company: CompanySettings
   wilkinsSpence?: WilkinsSpenceRates
 }
@@ -138,9 +144,16 @@ export interface QuoteResult {
   baseTotal: number             // before price adjustments
   adjustmentPctAmount: number   // Rs value of % adjustment (can be negative)
   adjustmentRsAmount:  number   // flat adjustment (same sign as input)
-  total: number                 // final total after adjustments + rounding
-  perUnitPrice: number
+  total: number                 // production cost after adjustments + rounding (excl. taxes)
+  perUnitPrice: number          // per-unit production cost (excl. taxes)
   isTwoPly: boolean
+  // ── Taxes (applied on top of production cost) ─────────────────────────────
+  ssclPercentage: number
+  ssclAmount: number
+  vatPercentage: number
+  vatAmount: number
+  grandTotal: number            // total + SSCL + VAT
+  grandTotalPerUnit: number
 }
 
 // ─── Saved quote (Firestore: collection 'quotes') ────────────────────────────

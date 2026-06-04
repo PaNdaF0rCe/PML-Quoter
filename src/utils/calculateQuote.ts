@@ -9,7 +9,7 @@ import type { QuoteInput, QuoteResult, PricingConfig } from '../lib/pricingTypes
 
 export function calculateQuote(input: QuoteInput, pricing: PricingConfig): QuoteResult | null {
   const { length, width, quantity } = input
-  const { materials, boards, addons, surcharges } = pricing
+  const { materials, boards, addons, surcharges, taxes } = pricing
 
   // Guard — invalid inputs
   if (!length || length <= 0 || !width || width <= 0 || !quantity || quantity <= 0) return null
@@ -114,6 +114,14 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
   // ── Per-unit price ────────────────────────────────────────────────────────
   const perUnitPrice = total / quantity
 
+  // ── Taxes (applied on top of production cost) ─────────────────────────────
+  const ssclPct  = taxes?.ssclPercentage ?? 2.125
+  const vatPct   = taxes?.vatPercentage  ?? 18
+  const ssclAmount = total * (ssclPct / 100)
+  const vatAmount  = total * (vatPct  / 100)
+  const grandTotal = total + ssclAmount + vatAmount
+  const grandTotalPerUnit = grandTotal / quantity
+
   return {
     totalArea,
     materialCost,
@@ -135,6 +143,12 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     total,
     perUnitPrice,
     isTwoPly,
+    ssclPercentage: ssclPct,
+    ssclAmount,
+    vatPercentage: vatPct,
+    vatAmount,
+    grandTotal,
+    grandTotalPerUnit,
   }
 }
 

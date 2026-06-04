@@ -120,6 +120,9 @@ export default function AdminDashboardPage() {
   const setAddon = (key: keyof typeof local.addons, v: number) =>
     setLocal(p => ({ ...p, addons: { ...p.addons, [key]: v } }))
 
+  const setTax = (key: 'ssclPercentage' | 'vatPercentage', v: number) =>
+    setLocal(p => ({ ...p, taxes: { ...p.taxes, [key]: v } }))
+
   const setCompany = (key: keyof typeof local.company, v: string) =>
     setLocal(p => ({ ...p, company: { ...p.company, [key]: v } }))
 
@@ -310,7 +313,38 @@ export default function AdminDashboardPage() {
           </div>
         </SectionCard>
 
-        {/* ── 5. Wilkins Spence Rates ── */}
+        {/* ── 5. Tax Rates ── */}
+        <SectionCard title="Tax Rates">
+          <p className="text-sm text-gray-500 mb-4">
+            Applied on top of the production cost. Shown as separate line items on quotes — not included in the base cost total.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex items-center gap-3">
+              <RateField
+                label="SSCL"
+                hint="Social Security Contribution Levy"
+                step={0.001}
+                min={0}
+                value={local.taxes?.ssclPercentage ?? 2.125}
+                onChange={v => setTax('ssclPercentage', v)}
+              />
+              <span className="text-lg font-semibold text-gray-500 mt-5">%</span>
+            </div>
+            <div className="flex items-center gap-3">
+              <RateField
+                label="VAT"
+                hint="Value Added Tax"
+                step={0.5}
+                min={0}
+                value={local.taxes?.vatPercentage ?? 18}
+                onChange={v => setTax('vatPercentage', v)}
+              />
+              <span className="text-lg font-semibold text-gray-500 mt-5">%</span>
+            </div>
+          </div>
+        </SectionCard>
+
+        {/* ── 6. Wilkins Spence Rates ── */}
         <SectionCard title="Wilkins Spence — Reel Rates (Rs per mm²)">
           <p className="text-sm text-gray-500 mb-4">
             Rates applied per mm² of sheet area for each reel size.
