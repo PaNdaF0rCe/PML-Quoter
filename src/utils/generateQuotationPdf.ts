@@ -331,7 +331,7 @@ export async function generateQuotationPdf(
   }
 
   // Note: figures are production cost only
-  sf(doc, 7, 'italic', [120, 120, 120] as [number,number,number])
+  sf(doc, 7, 'normal', [120, 120, 120] as [number,number,number])
   doc.text('* Production cost figures above do not include SSCL or VAT.', ML, ty + 3)
 
   y = ty + 10
