@@ -450,7 +450,7 @@ export default function CalculatorPage() {
                   >
                     <span className="block text-sm font-semibold text-gray-900">{BOARD_TYPE_LABELS[type]}</span>
                     <span className="block text-xs text-gray-400 mt-0.5">
-                      {input.boardGsm} GSM · Rs. {(pricing.boards[type] as Record<number,number>)[input.boardGsm] ?? '—'}/in²
+                      {input.boardGsm} GSM · Rs. {pricing.boards[type][input.boardGsm] ?? '—'}/in²
                     </span>
                   </button>
                 ))}

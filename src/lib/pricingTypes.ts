@@ -25,6 +25,7 @@ export interface BoardGsmRates {
   300: number
   350: number
   400: number
+  [gsm: number]: number
 }
 
 export interface BoardRates {

@@ -25,7 +25,7 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
 
   // ── Board cost ────────────────────────────────────────────────────────────
   const boardRate = input.board !== 'none'
-    ? (boards[input.board] as Record<number, number>)[input.boardGsm ?? 250] ?? 0
+    ? boards[input.board][input.boardGsm ?? 250] ?? 0
     : 0
   const boardCost = totalArea * boardRate
 
