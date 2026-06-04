@@ -243,7 +243,7 @@ export async function generateQuotationPdf(
 
   // ── Material section ────────────────────────────────────────────────────
   const matRows: [string, string][] = [['Material', materialLabel]]
-  if (input.board !== 'none') matRows.push(['Board', BOARD_LABELS[input.board]])
+  if (input.board !== 'none') matRows.push(['Board', `${BOARD_LABELS[input.board]} ${input.boardGsm ?? 250} GSM`])
   y = drawSection(doc, y, 'MATERIAL', matRows)
 
   // ── Production options ──────────────────────────────────────────────────

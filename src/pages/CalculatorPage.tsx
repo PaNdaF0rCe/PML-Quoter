@@ -9,8 +9,8 @@ import Button from '../components/ui/Button'
 import { calculateQuote, fmtRs, generateQuotationNumber, todayIso, futureIso } from '../utils/calculateQuote'
 import { generateQuotationPdf } from '../utils/generateQuotationPdf'
 import { saveQuote, updateSavedQuote, getQuote } from '../firebase/quotes'
-import type { CustomerDetails, QuoteInput, QuoteResult, MaterialId, BoardId, LaminateType } from '../lib/pricingTypes'
-import { MATERIAL_LABELS, BOARD_LABELS, LAMINATE_LABELS, COLOUR_OPTIONS } from '../lib/pricingTypes'
+import type { CustomerDetails, QuoteInput, QuoteResult, MaterialId, BoardType, BoardGsm, LaminateType } from '../lib/pricingTypes'
+import { MATERIAL_LABELS, BOARD_TYPE_LABELS, BOARD_GSM_OPTIONS, LAMINATE_LABELS, COLOUR_OPTIONS } from '../lib/pricingTypes'
 
 // ─── Defaults ────────────────────────────────────────────────────────────────
 
@@ -32,6 +32,7 @@ const defaultInput: QuoteInput = {
   quantity: 0,
   material: '2ply_brown',
   board: 'none',
+  boardGsm: 250,
   printing: false,
   colourCount: 1,
   varnish: false,
@@ -416,29 +417,67 @@ export default function CalculatorPage() {
                   </span>
                 </div>
               )}
-              <div className="grid grid-cols-3 gap-2">
-                {(Object.entries(BOARD_LABELS) as [BoardId, string][]).map(([id, label]) => (
+
+              {/* Row 1 — type selector */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {/* No Board option */}
+                <button
+                  type="button"
+                  onClick={() => setIn('board', 'none')}
+                  className={`p-3 rounded-xl border-2 text-left transition-all ${
+                    input.board === 'none'
+                      ? 'border-red-700 bg-red-50'
+                      : boardRequired
+                        ? 'border-amber-400 bg-amber-50'
+                        : 'border-gray-200 bg-white hover:border-red-300'
+                  }`}
+                >
+                  <span className="block text-sm font-semibold text-gray-900">No Board</span>
+                  <span className="block text-xs text-gray-400 mt-0.5">No board cost</span>
+                </button>
+
+                {/* White Back / Grey Back / Ivory */}
+                {(['white_back', 'grey_back', 'ivory'] as Exclude<BoardType, 'none'>[]).map(type => (
                   <button
-                    key={id}
+                    key={type}
                     type="button"
-                    onClick={() => setIn('board', id)}
+                    onClick={() => setIn('board', type)}
                     className={`p-3 rounded-xl border-2 text-left transition-all ${
-                      input.board === id
+                      input.board === type
                         ? 'border-red-700 bg-red-50'
-                        : boardRequired && id === 'none'
-                          ? 'border-amber-400 bg-amber-50'
-                          : 'border-gray-200 bg-white hover:border-red-300'
+                        : 'border-gray-200 bg-white hover:border-red-300'
                     }`}
                   >
-                    <span className="block text-sm font-semibold text-gray-900">{label}</span>
-                    {id !== 'none' && (
-                      <span className="block text-xs text-gray-500 mt-0.5">
-                        Rs. {pricing.boards[id as '250gsm' | '300gsm']}/in²
-                      </span>
-                    )}
+                    <span className="block text-sm font-semibold text-gray-900">{BOARD_TYPE_LABELS[type]}</span>
+                    <span className="block text-xs text-gray-400 mt-0.5">
+                      {input.boardGsm} GSM · Rs. {(pricing.boards[type] as Record<number,number>)[input.boardGsm] ?? '—'}/in²
+                    </span>
                   </button>
                 ))}
               </div>
+
+              {/* Row 2 — GSM selector (only when a type is chosen) */}
+              {input.board !== 'none' && (
+                <div className="mt-3">
+                  <p className="text-xs text-gray-500 mb-2">GSM weight</p>
+                  <div className="flex flex-wrap gap-2">
+                    {BOARD_GSM_OPTIONS.map(gsm => (
+                      <button
+                        key={gsm}
+                        type="button"
+                        onClick={() => setIn('boardGsm', gsm as BoardGsm)}
+                        className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
+                          (input.boardGsm ?? 250) === gsm
+                            ? 'bg-red-700 border-red-700 text-white'
+                            : 'bg-white border-gray-300 text-gray-700 hover:border-red-400'
+                        }`}
+                      >
+                        {gsm} GSM
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </Card>
 
             {/* Printing & Add-ons */}
@@ -743,7 +782,7 @@ export default function CalculatorPage() {
                       <CostRow label={`Material — ${MATERIAL_LABELS[input.material]}`} value={fmtRs(quote.materialCost)} />
                     )}
                     {quote.boardCost > 0 && (
-                      <CostRow label={`Board — ${BOARD_LABELS[input.board]}`} value={fmtRs(quote.boardCost)} />
+                      <CostRow label={`Board — ${BOARD_TYPE_LABELS[input.board]} ${input.boardGsm ?? 250} GSM`} value={fmtRs(quote.boardCost)} />
                     )}
                     {quote.printingCost > 0 && (
                       <CostRow label={`Printing (${input.colourCount} colour${input.colourCount > 1 ? 's' : ''})`} value={fmtRs(quote.printingCost)} />

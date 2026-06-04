@@ -114,8 +114,8 @@ export default function AdminDashboardPage() {
   const setMaterial = (key: keyof typeof local.materials, v: number) =>
     setLocal(p => ({ ...p, materials: { ...p.materials, [key]: v } }))
 
-  const setBoard = (key: keyof typeof local.boards, v: number) =>
-    setLocal(p => ({ ...p, boards: { ...p.boards, [key]: v } }))
+  const setBoard = (type: 'white_back' | 'grey_back' | 'ivory', gsm: 250 | 300 | 350 | 400, v: number) =>
+    setLocal(p => ({ ...p, boards: { ...p.boards, [type]: { ...p.boards[type], [gsm]: v } } }))
 
   const setAddon = (key: keyof typeof local.addons, v: number) =>
     setLocal(p => ({ ...p, addons: { ...p.addons, [key]: v } }))
@@ -199,24 +199,24 @@ export default function AdminDashboardPage() {
 
         {/* ── 2. Board Rates ── */}
         <SectionCard title="Board Rates (Rs per in²)">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <RateField
-              label="250 GSM Board"
-              value={local.boards['250gsm']}
-              onChange={v => setBoard('250gsm', v)}
-            />
-            <RateField
-              label="300 GSM Board"
-              value={local.boards['300gsm']}
-              onChange={v => setBoard('300gsm', v)}
-            />
-            <RateField
-              label="Ivory Board"
-              value={local.boards['ivory']}
-              onChange={v => setBoard('ivory', v)}
-            />
-          </div>
-          <p className="mt-3 text-xs text-gray-400">"None" option has no cost and requires no rate.</p>
+          {(['white_back', 'grey_back', 'ivory'] as const).map(type => (
+            <div key={type} className="mb-5 last:mb-0">
+              <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide mb-3">
+                {type === 'white_back' ? 'White Back' : type === 'grey_back' ? 'Grey Back' : 'Ivory'}
+              </p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {([250, 300, 350, 400] as const).map(gsm => (
+                  <RateField
+                    key={gsm}
+                    label={`${gsm} GSM`}
+                    value={local.boards[type][gsm]}
+                    onChange={v => setBoard(type, gsm, v)}
+                  />
+                ))}
+              </div>
+            </div>
+          ))}
+          <p className="mt-3 text-xs text-gray-400">"No Board" option has no cost and requires no rate.</p>
         </SectionCard>
 
         {/* ── 3. Add-on Rates ── */}

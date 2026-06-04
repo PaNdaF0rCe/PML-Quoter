@@ -1,8 +1,12 @@
 // ─── Material / board / laminate IDs ─────────────────────────────────────────
 
-export type MaterialId = '2ply_brown' | '2ply_white' | '3ply_brown' | '3ply_white' | '2ply_bflute' | '3ply_bflute' | 'none'
-export type BoardId    = 'none' | '250gsm' | '300gsm' | 'ivory'
+export type MaterialId  = '2ply_brown' | '2ply_white' | '3ply_brown' | '3ply_white' | '2ply_bflute' | '3ply_bflute' | 'none'
+export type BoardType   = 'none' | 'white_back' | 'grey_back' | 'ivory'
+export type BoardGsm    = 250 | 300 | 350 | 400
 export type LaminateType = 'none' | 'hot' | 'cold' | 'uv'
+
+/** @deprecated Use BoardType instead */
+export type BoardId = BoardType
 
 // ─── Pricing config (stored in Firestore, editable in admin) ─────────────────
 
@@ -16,10 +20,17 @@ export interface MaterialRates {
   // 'none' (board-only) has no rate
 }
 
+export interface BoardGsmRates {
+  250: number   // Rs per in²
+  300: number
+  350: number
+  400: number
+}
+
 export interface BoardRates {
-  '250gsm': number       // Rs per in²
-  '300gsm': number
-  'ivory':  number
+  white_back: BoardGsmRates
+  grey_back:  BoardGsmRates
+  ivory:      BoardGsmRates
 }
 
 export interface AddOnRates {
@@ -86,7 +97,8 @@ export interface QuoteInput {
   width: number               // inches
   quantity: number
   material: MaterialId
-  board: BoardId
+  board: BoardType
+  boardGsm: BoardGsm
   // ── core add-ons ──
   printing: boolean
   colourCount: number      // 1-N; 4 = CMYK
@@ -152,12 +164,17 @@ export const MATERIAL_LABELS: Record<MaterialId, string> = {
   'none':        'Board Only',
 }
 
-export const BOARD_LABELS: Record<BoardId, string> = {
-  none:    'None',
-  '250gsm': '250 GSM',
-  '300gsm': '300 GSM',
-  'ivory':  'Ivory Board',
+export const BOARD_TYPE_LABELS: Record<BoardType, string> = {
+  none:       'None',
+  white_back: 'White Back',
+  grey_back:  'Grey Back',
+  ivory:      'Ivory',
 }
+
+/** @deprecated Use BOARD_TYPE_LABELS */
+export const BOARD_LABELS = BOARD_TYPE_LABELS
+
+export const BOARD_GSM_OPTIONS: BoardGsm[] = [250, 300, 350, 400]
 
 export const LAMINATE_LABELS: Record<LaminateType, string> = {
   none: 'None',

@@ -10,9 +10,9 @@ export const defaultPricing: PricingConfig = {
     '3ply_bflute': 0.115,
   },
   boards: {
-    '250gsm': 0.040,
-    '300gsm': 0.048,
-    'ivory':  0.055,
+    white_back: { 250: 0.040, 300: 0.048, 350: 0.055, 400: 0.062 },
+    grey_back:  { 250: 0.036, 300: 0.044, 350: 0.050, 400: 0.058 },
+    ivory:      { 250: 0.055, 300: 0.065, 350: 0.075, 400: 0.085 },
   },
   addons: {
     printingPerColour:      2,

@@ -15,7 +15,11 @@ export async function fetchPricing(): Promise<PricingConfig> {
       // This prevents "undefined" rates when the Firestore doc pre-dates a schema addition.
       return {
         materials:    { ...defaultPricing.materials,    ...data.materials },
-        boards:       { ...defaultPricing.boards,       ...data.boards },
+        boards: {
+          white_back: { ...defaultPricing.boards.white_back, ...(data.boards?.white_back ?? {}) },
+          grey_back:  { ...defaultPricing.boards.grey_back,  ...(data.boards?.grey_back  ?? {}) },
+          ivory:      { ...defaultPricing.boards.ivory,      ...(data.boards?.ivory      ?? {}) },
+        },
         addons:       { ...defaultPricing.addons,       ...data.addons },
         surcharges:   { ...defaultPricing.surcharges,   ...data.surcharges },
         company:      { ...defaultPricing.company,      ...data.company },

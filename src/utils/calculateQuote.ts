@@ -24,7 +24,10 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
   const materialCost = totalArea * materialRate
 
   // ── Board cost ────────────────────────────────────────────────────────────
-  const boardCost = input.board !== 'none' ? totalArea * boards[input.board] : 0
+  const boardRate = input.board !== 'none'
+    ? (boards[input.board] as Record<number, number>)[input.boardGsm ?? 250] ?? 0
+    : 0
+  const boardCost = totalArea * boardRate
 
   // ── Printing cost ─────────────────────────────────────────────────────────
   const printingCost = input.printing
