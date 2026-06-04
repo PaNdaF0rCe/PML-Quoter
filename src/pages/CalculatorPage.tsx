@@ -111,6 +111,7 @@ export default function CalculatorPage() {
   const [currentSavedId, setCurrentSavedId] = useState<string | null>(savedId ?? null)
   const [showCustomer, setShowCustomer] = useState(true)
   const [foilingEnabled, setFoilingEnabled] = useState(false)
+  const [dimUnit, setDimUnit] = useState<'mm' | 'cm' | 'in'>('in')
 
   // Load saved quote if URL has an ID
   useEffect(() => {
@@ -188,6 +189,19 @@ export default function CalculatorPage() {
 
   const isValid = input.length > 0 && input.width > 0 && input.quantity > 0
   const boardRequired = input.printing && input.board === 'none'
+
+  // ── Unit conversion helpers (internal storage always in inches) ────────────
+  const toInches = (v: number, u: typeof dimUnit) =>
+    u === 'mm' ? v / 25.4 : u === 'cm' ? v / 2.54 : v
+  const fromInches = (inches: number, u: typeof dimUnit) =>
+    u === 'mm' ? inches * 25.4 : u === 'cm' ? inches * 2.54 : inches
+  const unitLabel = dimUnit === 'mm' ? 'mm' : dimUnit === 'cm' ? 'cm' : 'in'
+  // Area conversion: 1 in² = 645.16 mm² = 6.4516 cm²
+  const areaScale = dimUnit === 'mm' ? 645.16 : dimUnit === 'cm' ? 6.4516 : 1
+  const areaUnit  = dimUnit === 'mm' ? 'mm²' : dimUnit === 'cm' ? 'cm²' : 'in²'
+  const dimStep   = dimUnit === 'mm' ? 1 : dimUnit === 'cm' ? 0.1 : 0.5
+  const dimFmt    = (inches: number) =>
+    parseFloat(fromInches(inches, dimUnit).toFixed(dimUnit === 'in' ? 3 : 2))
 
   const addonNote = (rate: number, unit: string) => `Rs. ${rate} per ${unit}`
   const laminateNote = (type: LaminateType) => {
@@ -313,31 +327,52 @@ export default function CalculatorPage() {
             </Card>
 
             {/* Costing Inputs */}
-            <Card title="Dimensions & Quantity">
+            <Card>
+              {/* Card header row with unit switcher */}
+              <div className="flex items-center justify-between mb-4">
+                <span className="text-sm font-semibold text-gray-800">Dimensions &amp; Quantity</span>
+                <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                  {(['mm', 'cm', 'in'] as const).map(u => (
+                    <button
+                      key={u}
+                      type="button"
+                      onClick={() => setDimUnit(u)}
+                      className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors ${
+                        dimUnit === u
+                          ? 'bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-500 hover:text-gray-700'
+                      }`}
+                    >
+                      {u}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <Label htmlFor="len">Length (in)</Label>
+                  <Label htmlFor="len">Length ({unitLabel})</Label>
                   <Input
                     id="len"
                     type="number"
                     min={0}
-                    step={0.5}
-                    value={input.length || ''}
-                    onChange={e => setIn('length', Math.max(0, Number(e.target.value)))}
-                    placeholder="e.g. 15"
+                    step={dimStep}
+                    value={input.length ? dimFmt(input.length) : ''}
+                    onChange={e => setIn('length', Math.max(0, toInches(Number(e.target.value), dimUnit)))}
+                    placeholder={dimUnit === 'mm' ? 'e.g. 380' : dimUnit === 'cm' ? 'e.g. 38' : 'e.g. 15'}
                   />
                   {!input.length && <p className="mt-1 text-xs text-red-600">Required</p>}
                 </div>
                 <div>
-                  <Label htmlFor="wid">Width (in)</Label>
+                  <Label htmlFor="wid">Width ({unitLabel})</Label>
                   <Input
                     id="wid"
                     type="number"
                     min={0}
-                    step={0.5}
-                    value={input.width || ''}
-                    onChange={e => setIn('width', Math.max(0, Number(e.target.value)))}
-                    placeholder="e.g. 10"
+                    step={dimStep}
+                    value={input.width ? dimFmt(input.width) : ''}
+                    onChange={e => setIn('width', Math.max(0, toInches(Number(e.target.value), dimUnit)))}
+                    placeholder={dimUnit === 'mm' ? 'e.g. 254' : dimUnit === 'cm' ? 'e.g. 25' : 'e.g. 10'}
                   />
                   {!input.width && <p className="mt-1 text-xs text-red-600">Required</p>}
                 </div>
@@ -355,12 +390,22 @@ export default function CalculatorPage() {
                   {!input.quantity && <p className="mt-1 text-xs text-red-600">Required</p>}
                 </div>
               </div>
+
               {input.length > 0 && input.width > 0 && (
                 <p className="mt-3 text-xs text-gray-500">
-                  Area per unit: <strong>{(input.length * input.width).toLocaleString()} in²</strong>
+                  Area per unit:{' '}
+                  <strong>
+                    {(input.length * input.width * areaScale).toLocaleString(undefined, { maximumFractionDigits: 2 })} {areaUnit}
+                  </strong>
                   {input.quantity > 0 && (
                     <span className="ml-2 text-gray-400">
-                      · Total: {(input.length * input.width * input.quantity).toLocaleString()} in²
+                      · Total:{' '}
+                      {(input.length * input.width * areaScale * input.quantity).toLocaleString(undefined, { maximumFractionDigits: 0 })} {areaUnit}
+                    </span>
+                  )}
+                  {dimUnit !== 'in' && (
+                    <span className="ml-2 text-gray-300">
+                      ({(input.length * input.width).toLocaleString(undefined, { maximumFractionDigits: 3 })} in² internally)
                     </span>
                   )}
                 </p>
