@@ -147,12 +147,10 @@ export interface QuoteResult {
   total: number                 // production cost after adjustments + rounding (excl. taxes)
   perUnitPrice: number          // per-unit production cost (excl. taxes)
   isTwoPly: boolean
-  // ── Taxes (applied on top of production cost) ─────────────────────────────
+  // ── Taxes ─────────────────────────────────────────────────────────────────
   ssclPercentage: number
   ssclAmount: number
-  vatPercentage: number
-  vatAmount: number
-  grandTotal: number            // total + SSCL + VAT
+  grandTotal: number            // total + SSCL (VAT shown as note, not calculated)
   grandTotalPerUnit: number
 }
 

@@ -114,12 +114,11 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
   // ── Per-unit price ────────────────────────────────────────────────────────
   const perUnitPrice = total / quantity
 
-  // ── Taxes (applied on top of production cost) ─────────────────────────────
+  // ── Taxes ─────────────────────────────────────────────────────────────────
+  // SSCL is calculated and included. VAT is noted on the quote but not totalled.
   const ssclPct  = taxes?.ssclPercentage ?? 2.125
-  const vatPct   = taxes?.vatPercentage  ?? 18
   const ssclAmount = total * (ssclPct / 100)
-  const vatAmount  = total * (vatPct  / 100)
-  const grandTotal = total + ssclAmount + vatAmount
+  const grandTotal = total + ssclAmount
   const grandTotalPerUnit = grandTotal / quantity
 
   return {
@@ -145,8 +144,6 @@ export function calculateQuote(input: QuoteInput, pricing: PricingConfig): Quote
     isTwoPly,
     ssclPercentage: ssclPct,
     ssclAmount,
-    vatPercentage: vatPct,
-    vatAmount,
     grandTotal,
     grandTotalPerUnit,
   }

@@ -811,14 +811,14 @@ export default function CalculatorPage() {
 
               {isValid && quote && (
                 <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                  {/* Summary header — shows grand total (incl. taxes) */}
+                  {/* Summary header */}
                   <div className="bg-red-700 px-5 py-4">
                     <p className="text-white text-xs font-semibold uppercase tracking-wide">Quotation Summary</p>
                     <p className="text-white text-3xl font-bold mt-1">{fmtRs(quote.grandTotal)}</p>
                     <p className="text-red-200 text-sm mt-0.5">
                       {fmtRs(quote.grandTotalPerUnit)} per unit · {input.quantity.toLocaleString()} units
                     </p>
-                    <p className="text-red-300 text-xs mt-1.5">Includes SSCL &amp; VAT</p>
+                    <p className="text-red-300 text-xs mt-1.5">Includes SSCL · + VAT applicable</p>
                   </div>
 
                   {/* Cost breakdown */}
@@ -893,41 +893,44 @@ export default function CalculatorPage() {
                         </div>
                       </>
                     )}
-                    {/* Production cost total */}
-                    <div className="border-t-2 border-red-200 pt-3 flex items-center justify-between">
-                      <span className="text-sm font-semibold text-gray-700">Production Cost</span>
-                      <span className="text-base font-semibold text-gray-800">{fmtRs(quote.total)}</span>
+                    {/* Production cost + per-unit pre-SSCL */}
+                    <div className="border-t-2 border-red-200 pt-3 space-y-0.5">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-gray-700">Production Cost</span>
+                        <span className="text-base font-semibold text-gray-800">{fmtRs(quote.total)}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs text-gray-400">Per unit (pre-SSCL)</span>
+                        <span className="text-xs text-gray-500">{fmtRs(quote.perUnitPrice)}</span>
+                      </div>
                     </div>
-                    <p className="text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 mt-2">
-                      ⚠ This figure represents production cost only and does not include applicable taxes.
+                    <p className="text-xs text-gray-400 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2 mt-2">
+                      Production cost only — does not include SSCL or VAT.
                     </p>
 
-                    {/* Tax lines */}
+                    {/* SSCL */}
                     <div className="border-t border-dashed border-gray-200 pt-2 mt-2 space-y-0.5">
-                      <p className="text-xs text-gray-400 uppercase tracking-wide pb-0.5">Taxes</p>
+                      <p className="text-xs text-gray-400 uppercase tracking-wide pb-0.5">Levy</p>
                       <CostRow
                         label={`SSCL (${quote.ssclPercentage}%)`}
                         value={fmtRs(quote.ssclAmount)}
                       />
-                      <CostRow
-                        label={`VAT (${quote.vatPercentage}%)`}
-                        value={fmtRs(quote.vatAmount)}
-                      />
                     </div>
 
-                    {/* Grand total */}
+                    {/* Grand total + VAT note */}
                     <div className="border-t-2 border-red-700 pt-3 mt-1 flex items-center justify-between">
-                      <span className="text-base font-bold text-gray-900">Grand Total</span>
+                      <span className="text-base font-bold text-gray-900">Total (incl. SSCL)</span>
                       <span className="text-xl font-bold text-red-700">{fmtRs(quote.grandTotal)}</span>
                     </div>
                     <div className="flex items-center justify-between pb-1">
-                      <span className="text-sm text-gray-500">Per Unit (incl. tax)</span>
+                      <span className="text-sm text-gray-500">Per unit (incl. SSCL)</span>
                       <span className="text-sm font-semibold text-gray-800">{fmtRs(quote.grandTotalPerUnit)}</span>
                     </div>
-                    <div className="flex items-center justify-between pb-2">
+                    <div className="flex items-center justify-between pb-1">
                       <span className="text-sm text-gray-500">Total Area</span>
                       <span className="text-sm font-semibold text-gray-800">{quote.totalArea.toLocaleString()} in²</span>
                     </div>
+                    <p className="text-xs text-gray-400 italic pb-2">+ VAT applicable</p>
                   </div>
 
                   {/* Actions */}
@@ -1015,7 +1018,7 @@ export default function CalculatorPage() {
             <div className="flex-1 min-w-0">
               <p className="text-xs text-gray-500 leading-none">Total</p>
               <p className="text-xl font-bold text-red-700 leading-tight">{fmtRs(quote.grandTotal)}</p>
-              <p className="text-xs text-gray-400 leading-none mt-0.5">{fmtRs(quote.grandTotalPerUnit)}/unit · incl. tax</p>
+              <p className="text-xs text-gray-400 leading-none mt-0.5">{fmtRs(quote.grandTotalPerUnit)}/unit · incl. SSCL + VAT</p>
             </div>
             {/* Save */}
             <button

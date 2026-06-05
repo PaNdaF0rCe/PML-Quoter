@@ -290,53 +290,44 @@ export async function generateQuotationPdf(
   doc.setDrawColor(254, 202, 202); doc.setLineWidth(0.3)
   doc.line(ML + 4, midY, ML + CW - 4, midY)
 
-  // Unit price
+  // Unit price (pre-SSCL)
   sf(doc, 8, 'normal', GREY)
-  doc.text('UNIT PRICE', ML + 6, y + 13)
+  doc.text('UNIT PRICE (pre-SSCL)', ML + 6, y + 13)
   sf(doc, 14, 'bold', RED)
   doc.text(fmtRs(result.perUnitPrice), PW - MR - 5, y + 13, { align: 'right' })
 
-  // Total cost (production only)
+  // Total production cost
   sf(doc, 8, 'normal', GREY)
   doc.text('PRODUCTION COST', ML + 6, y + 28)
   sf(doc, 14, 'bold', RED)
   doc.text(fmtRs(result.total), PW - MR - 5, y + 28, { align: 'right' })
 
-  // per unit label under unit price
   sf(doc, 7, 'normal', GREY)
-  doc.text('per unit', PW - MR - 5, y + 18, { align: 'right' })
-  doc.text('excl. taxes', PW - MR - 5, y + 33, { align: 'right' })
+  doc.text('excl. SSCL & VAT', PW - MR - 5, y + 18, { align: 'right' })
+  doc.text('excl. SSCL & VAT', PW - MR - 5, y + 33, { align: 'right' })
 
   y += cardH + 6
 
-  // ── Tax breakdown ──────────────────────────────────────────────────────────
-  y = ensureSpace(doc, y, 36)
-  y = sectionBar(doc, y, 'TAX BREAKDOWN')
+  // ── SSCL breakdown ─────────────────────────────────────────────────────────
+  y = ensureSpace(doc, y, 30)
+  y = sectionBar(doc, y, 'LEVY')
 
-  const taxRows: [string, string][] = [
-    [`SSCL (${result.ssclPercentage}%)`,  fmtRs(result.ssclAmount)],
-    [`VAT (${result.vatPercentage}%)`,    fmtRs(result.vatAmount)],
-  ]
-  const taxBgH = taxRows.length * 8 + 14
+  const taxBgH = 22
   doc.setFillColor(249, 250, 251)
   doc.roundedRect(ML, y, CW, taxBgH, 2, 2, 'F')
   doc.setDrawColor(229, 231, 235); doc.setLineWidth(0.3)
   doc.roundedRect(ML, y, CW, taxBgH, 2, 2, 'S')
 
-  let ty = y + 7
-  for (const [label, val] of taxRows) {
-    sf(doc, 8, 'normal', GREY);  doc.text(label, ML + 5, ty)
-    sf(doc, 8, 'normal', DARK);  doc.text(val, PW - MR - 5, ty, { align: 'right' })
-    ty += 8
-  }
+  const ty = y + 8
+  sf(doc, 8, 'normal', GREY);  doc.text(`SSCL (${result.ssclPercentage}%)`, ML + 5, ty)
+  sf(doc, 8, 'normal', DARK);  doc.text(fmtRs(result.ssclAmount), PW - MR - 5, ty, { align: 'right' })
 
-  // Note: figures are production cost only
   sf(doc, 7, 'normal', [120, 120, 120] as [number,number,number])
-  doc.text('* Production cost figures above do not include SSCL or VAT.', ML, ty + 3)
+  doc.text('* Production cost figures do not include SSCL or VAT.', ML, ty + 10)
 
-  y = ty + 10
+  y = ty + 18
 
-  // Grand total card
+  // Grand total card (incl. SSCL, excl. VAT)
   y = ensureSpace(doc, y, 28)
   const gtH = 22
   doc.setFillColor(254, 242, 242)
@@ -344,9 +335,9 @@ export async function generateQuotationPdf(
   doc.setDrawColor(...RED); doc.setLineWidth(0.6)
   doc.roundedRect(ML, y, CW, gtH, 3, 3, 'S')
 
-  sf(doc, 8, 'normal', GREY);  doc.text('GRAND TOTAL (incl. SSCL & VAT)', ML + 6, y + 9)
+  sf(doc, 8, 'normal', GREY);  doc.text('TOTAL (incl. SSCL)', ML + 6, y + 9)
   sf(doc, 14, 'bold', RED);    doc.text(fmtRs(result.grandTotal), PW - MR - 5, y + 9, { align: 'right' })
-  sf(doc, 7, 'normal', GREY);  doc.text(`${fmtRs(result.grandTotalPerUnit)} per unit`, PW - MR - 5, y + 17, { align: 'right' })
+  sf(doc, 7, 'normal', GREY);  doc.text(`${fmtRs(result.grandTotalPerUnit)} per unit  ·  + VAT applicable`, PW - MR - 5, y + 17, { align: 'right' })
 
   y += gtH + 8
 
