@@ -345,29 +345,36 @@ export default function AdminDashboardPage() {
         </SectionCard>
 
         {/* ── 6. Wilkins Spence Rates ── */}
-        <SectionCard title="Wilkins Spence — Reel Rates (Rs per mm²)">
+        <SectionCard title="Wilkins Spence — Reel Rates (Rs per in²)">
           <p className="text-sm text-gray-500 mb-4">
-            Rates applied per mm² of sheet area for each reel size.
+            Rates applied per square inch of sheet area for each reel size. Sheet dimensions are entered in mm and converted automatically.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <RateField
-              label="31 mm Reel"
-              hint="Rs per mm²"
-              step={0.000001}
+              label='31" Reel'
+              hint="Rs per in²"
+              step={0.001}
               value={local.wilkinsSpence?.reel31 ?? defaultWS.reel31}
               onChange={v => setWS('reel31', v)}
             />
             <RateField
-              label="35 mm Reel"
-              hint="Rs per mm²"
-              step={0.000001}
+              label='35" Reel'
+              hint="Rs per in²"
+              step={0.001}
               value={local.wilkinsSpence?.reel35 ?? defaultWS.reel35}
               onChange={v => setWS('reel35', v)}
             />
             <RateField
-              label="39 mm Reel"
-              hint="Rs per mm²"
-              step={0.000001}
+              label='37" Reel'
+              hint="Rs per in²"
+              step={0.001}
+              value={local.wilkinsSpence?.reel37 ?? defaultWS.reel37}
+              onChange={v => setWS('reel37', v)}
+            />
+            <RateField
+              label='39" Reel'
+              hint="Rs per in²"
+              step={0.001}
               value={local.wilkinsSpence?.reel39 ?? defaultWS.reel39}
               onChange={v => setWS('reel39', v)}
             />

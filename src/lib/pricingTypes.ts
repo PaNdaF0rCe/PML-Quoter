@@ -56,8 +56,9 @@ export interface TaxRates {
 }
 
 export interface WilkinsSpenceRates {
-  reel31: number   // Rs per mm²
+  reel31: number   // Rs per in²
   reel35: number
+  reel37: number
   reel39: number
 }
 

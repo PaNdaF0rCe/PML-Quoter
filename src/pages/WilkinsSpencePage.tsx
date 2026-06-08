@@ -5,16 +5,23 @@ import { defaultPricing } from '../data/defaults/pricing'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+const MM_PER_INCH = 25.4
+
+function mmToIn(mm: number): number {
+  return mm / MM_PER_INCH
+}
+
 function fmtRs(n: number) {
   return 'Rs ' + n.toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-type ReelSize = 31 | 35 | 39
+type ReelSize = 31 | 35 | 37 | 39
 
 const REEL_OPTIONS: { value: ReelSize; label: string }[] = [
-  { value: 31, label: '31 mm' },
-  { value: 35, label: '35 mm' },
-  { value: 39, label: '39 mm' },
+  { value: 31, label: '31"' },
+  { value: 35, label: '35"' },
+  { value: 37, label: '37"' },
+  { value: 39, label: '39"' },
 ]
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -31,17 +38,24 @@ export default function WilkinsSpencePage() {
   const rateMap: Record<ReelSize, number> = {
     31: ws.reel31,
     35: ws.reel35,
+    37: ws.reel37 ?? defaultPricing.wilkinsSpence!.reel37,
     39: ws.reel39,
   }
 
-  const w = parseFloat(sheetWidth) || 0
-  const h = parseFloat(sheetHeight) || 0
+  const wMm = parseFloat(sheetWidth) || 0
+  const hMm = parseFloat(sheetHeight) || 0
   const qty = parseInt(quantity) || 0
   const rate = rateMap[reelSize]
-  const areaMm2 = w * h
-  const costPerUnit = areaMm2 * rate
+
+  // Convert mm dimensions to inches, then get area in in²
+  const wIn = mmToIn(wMm)
+  const hIn = mmToIn(hMm)
+  const areaSqIn = wIn * hIn
+  const areaMm2 = wMm * hMm
+
+  const costPerUnit = areaSqIn * rate
   const total = costPerUnit * qty
-  const hasResult = w > 0 && h > 0 && qty > 0
+  const hasResult = wMm > 0 && hMm > 0 && qty > 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -69,7 +83,7 @@ export default function WilkinsSpencePage() {
           {/* ── Reel Size ── */}
           <div>
             <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-              Reel Size
+              Reel Size (inches)
             </label>
             <div className="flex gap-3">
               {REEL_OPTIONS.map(opt => (
@@ -87,7 +101,7 @@ export default function WilkinsSpencePage() {
               ))}
             </div>
             <p className="text-xs text-gray-400 mt-2">
-              Rate: <span className="font-medium text-gray-600">Rs {rateMap[reelSize].toFixed(6)}</span> per mm²
+              Rate: <span className="font-medium text-gray-600">Rs {rateMap[reelSize].toFixed(4)}</span> per in²
             </p>
           </div>
 
@@ -98,7 +112,7 @@ export default function WilkinsSpencePage() {
             </label>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Width</label>
+                <label className="block text-xs text-gray-500 mb-1">Width (mm)</label>
                 <input
                   type="number"
                   min={0}
@@ -110,7 +124,7 @@ export default function WilkinsSpencePage() {
                 />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Height</label>
+                <label className="block text-xs text-gray-500 mb-1">Height (mm)</label>
                 <input
                   type="number"
                   min={0}
@@ -122,9 +136,16 @@ export default function WilkinsSpencePage() {
                 />
               </div>
             </div>
-            {w > 0 && h > 0 && (
+            {wMm > 0 && hMm > 0 && (
               <p className="text-xs text-gray-400 mt-2">
-                Area: <span className="font-medium text-gray-600">{areaMm2.toLocaleString()} mm²</span>
+                Area:{' '}
+                <span className="font-medium text-gray-600">
+                  {areaMm2.toLocaleString()} mm²
+                </span>
+                {' '}={' '}
+                <span className="font-medium text-gray-600">
+                  {areaSqIn.toFixed(4)} in²
+                </span>
               </p>
             )}
           </div>
@@ -150,12 +171,16 @@ export default function WilkinsSpencePage() {
             <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 space-y-2">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Cost Breakdown</h3>
               <div className="flex justify-between text-sm text-gray-600">
-                <span>Sheet area</span>
-                <span className="font-medium">{areaMm2.toLocaleString()} mm²</span>
+                <span>Sheet dimensions</span>
+                <span className="font-medium">{wMm} × {hMm} mm</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
-                <span>Rate ({reelSize}mm reel)</span>
-                <span className="font-medium">Rs {rate.toFixed(6)} / mm²</span>
+                <span>Sheet area</span>
+                <span className="font-medium">{areaSqIn.toFixed(4)} in²</span>
+              </div>
+              <div className="flex justify-between text-sm text-gray-600">
+                <span>Rate ({reelSize}" reel)</span>
+                <span className="font-medium">Rs {rate.toFixed(4)} / in²</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Cost per sheet</span>
