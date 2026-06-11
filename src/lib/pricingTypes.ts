@@ -58,10 +58,14 @@ export interface TaxRates {
 export interface SpecialRateCompany {
   id: string
   name: string
-  reel31: number   // Rs per in²
-  reel35: number
-  reel37: number
-  reel39: number
+  rateType: 'reel' | 'flat'
+  // reel rates — used when rateType = 'reel'
+  reel31?: number   // Rs per in²
+  reel35?: number
+  reel37?: number
+  reel39?: number
+  // flat rate — used when rateType = 'flat'
+  flatRate?: number  // Rs per in²
 }
 
 export interface CompanySettings {

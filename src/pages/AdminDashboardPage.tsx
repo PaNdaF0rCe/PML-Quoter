@@ -148,14 +148,21 @@ export default function AdminDashboardPage() {
     setSpecialRates(specialRates.filter(c => c.id !== id))
 
   const [newCompanyName, setNewCompanyName] = useState('')
-  const [newRates, setNewRates] = useState({ reel31: 0, reel35: 0, reel37: 0, reel39: 0 })
+  const [newRateType, setNewRateType] = useState<'reel' | 'flat'>('reel')
+  const [newReelRates, setNewReelRates] = useState({ reel31: 0, reel35: 0, reel37: 0, reel39: 0 })
+  const [newFlatRate, setNewFlatRate] = useState(0)
 
   const addCompany = () => {
     if (!newCompanyName.trim()) return
     const id = newCompanyName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-    setSpecialRates([...specialRates, { id, name: newCompanyName.trim(), ...newRates }])
+    const entry: SpecialRateCompany = newRateType === 'flat'
+      ? { id, name: newCompanyName.trim(), rateType: 'flat', flatRate: newFlatRate }
+      : { id, name: newCompanyName.trim(), rateType: 'reel', ...newReelRates }
+    setSpecialRates([...specialRates, entry])
     setNewCompanyName('')
-    setNewRates({ reel31: 0, reel35: 0, reel37: 0, reel39: 0 })
+    setNewRateType('reel')
+    setNewReelRates({ reel31: 0, reel35: 0, reel37: 0, reel39: 0 })
+    setNewFlatRate(0)
   }
 
   return (
@@ -373,15 +380,16 @@ export default function AdminDashboardPage() {
         </SectionCard>
 
         {/* ── 6. Special Rate Companies ── */}
-        <SectionCard title="Special Rate Companies (Rs per in²)">
+        <SectionCard title="Special Rate Companies">
           <p className="text-sm text-gray-500 mb-5">
-            Per-company reel rates for the Special Rate Quotation. Sheet dimensions are entered in mm and converted to in² automatically.
+            Each company uses either reel-size rates or a single flat rate (both Rs per in²). Sheet dimensions are entered in mm and converted automatically.
           </p>
 
           {/* Existing companies */}
-          <div className="space-y-5">
+          <div className="space-y-4">
             {specialRates.map(c => (
               <div key={c.id} className="border border-gray-200 rounded-xl p-4">
+                {/* Name + remove */}
                 <div className="flex items-center justify-between mb-3">
                   <input
                     type="text"
@@ -392,17 +400,46 @@ export default function AdminDashboardPage() {
                   <button
                     onClick={() => removeCompany(c.id)}
                     className="ml-3 text-xs text-gray-400 hover:text-red-600 transition-colors shrink-0"
-                    title="Remove company"
                   >
                     Remove
                   </button>
                 </div>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <RateField label='31" Reel' hint="Rs/in²" step={0.001} value={c.reel31} onChange={v => updateCompany(c.id, 'reel31', v)} />
-                  <RateField label='35" Reel' hint="Rs/in²" step={0.001} value={c.reel35} onChange={v => updateCompany(c.id, 'reel35', v)} />
-                  <RateField label='37" Reel' hint="Rs/in²" step={0.001} value={c.reel37} onChange={v => updateCompany(c.id, 'reel37', v)} />
-                  <RateField label='39" Reel' hint="Rs/in²" step={0.001} value={c.reel39} onChange={v => updateCompany(c.id, 'reel39', v)} />
+                {/* Rate type toggle */}
+                <div className="flex gap-2 mb-3">
+                  <button
+                    onClick={() => updateCompany(c.id, 'rateType', 'reel')}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-colors ${
+                      c.rateType === 'reel'
+                        ? 'border-red-700 bg-red-50 text-red-700'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    Reel Rates
+                  </button>
+                  <button
+                    onClick={() => updateCompany(c.id, 'rateType', 'flat')}
+                    className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-colors ${
+                      c.rateType === 'flat'
+                        ? 'border-red-700 bg-red-50 text-red-700'
+                        : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                    }`}
+                  >
+                    Single Rate
+                  </button>
                 </div>
+                {/* Rate fields */}
+                {c.rateType === 'reel' ? (
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <RateField label='31"' hint="Rs/in²" step={0.001} value={c.reel31 ?? 0} onChange={v => updateCompany(c.id, 'reel31', v)} />
+                    <RateField label='35"' hint="Rs/in²" step={0.001} value={c.reel35 ?? 0} onChange={v => updateCompany(c.id, 'reel35', v)} />
+                    <RateField label='37"' hint="Rs/in²" step={0.001} value={c.reel37 ?? 0} onChange={v => updateCompany(c.id, 'reel37', v)} />
+                    <RateField label='39"' hint="Rs/in²" step={0.001} value={c.reel39 ?? 0} onChange={v => updateCompany(c.id, 'reel39', v)} />
+                  </div>
+                ) : (
+                  <div className="max-w-xs">
+                    <RateField label="Flat Rate" hint="Rs/in²" step={0.001} value={c.flatRate ?? 0} onChange={v => updateCompany(c.id, 'flatRate', v)} />
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -417,18 +454,42 @@ export default function AdminDashboardPage() {
                 value={newCompanyName}
                 onChange={e => setNewCompanyName(e.target.value)}
               />
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                <RateField label='31" Reel' hint="Rs/in²" step={0.001} value={newRates.reel31} onChange={v => setNewRates(r => ({ ...r, reel31: v }))} />
-                <RateField label='35" Reel' hint="Rs/in²" step={0.001} value={newRates.reel35} onChange={v => setNewRates(r => ({ ...r, reel35: v }))} />
-                <RateField label='37" Reel' hint="Rs/in²" step={0.001} value={newRates.reel37} onChange={v => setNewRates(r => ({ ...r, reel37: v }))} />
-                <RateField label='39" Reel' hint="Rs/in²" step={0.001} value={newRates.reel39} onChange={v => setNewRates(r => ({ ...r, reel39: v }))} />
+              {/* Rate type for new company */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setNewRateType('reel')}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-colors ${
+                    newRateType === 'reel'
+                      ? 'border-red-700 bg-red-50 text-red-700'
+                      : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                  }`}
+                >
+                  Reel Rates
+                </button>
+                <button
+                  onClick={() => setNewRateType('flat')}
+                  className={`px-3 py-1 rounded-lg text-xs font-semibold border transition-colors ${
+                    newRateType === 'flat'
+                      ? 'border-red-700 bg-red-50 text-red-700'
+                      : 'border-gray-200 text-gray-500 hover:border-gray-300'
+                  }`}
+                >
+                  Single Rate
+                </button>
               </div>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={addCompany}
-                disabled={!newCompanyName.trim()}
-              >
+              {newRateType === 'reel' ? (
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <RateField label='31"' hint="Rs/in²" step={0.001} value={newReelRates.reel31} onChange={v => setNewReelRates(r => ({ ...r, reel31: v }))} />
+                  <RateField label='35"' hint="Rs/in²" step={0.001} value={newReelRates.reel35} onChange={v => setNewReelRates(r => ({ ...r, reel35: v }))} />
+                  <RateField label='37"' hint="Rs/in²" step={0.001} value={newReelRates.reel37} onChange={v => setNewReelRates(r => ({ ...r, reel37: v }))} />
+                  <RateField label='39"' hint="Rs/in²" step={0.001} value={newReelRates.reel39} onChange={v => setNewReelRates(r => ({ ...r, reel39: v }))} />
+                </div>
+              ) : (
+                <div className="max-w-xs">
+                  <RateField label="Flat Rate" hint="Rs/in²" step={0.001} value={newFlatRate} onChange={v => setNewFlatRate(v)} />
+                </div>
+              )}
+              <Button variant="secondary" size="sm" onClick={addCompany} disabled={!newCompanyName.trim()}>
                 + Add Company
               </Button>
             </div>
