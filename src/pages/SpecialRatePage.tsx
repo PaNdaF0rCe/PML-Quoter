@@ -13,6 +13,7 @@ function fmtRs(n: number) {
 }
 
 type ReelSize = 31 | 35 | 37 | 39
+type Mode = 'reel' | 'custom'
 
 const REEL_OPTIONS: { value: ReelSize; label: string }[] = [
   { value: 31, label: '31"' },
@@ -25,12 +26,13 @@ function getCompanyRate(company: SpecialRateCompany, reel: ReelSize): number {
   return { 31: company.reel31, 35: company.reel35, 37: company.reel37, 39: company.reel39 }[reel]
 }
 
+const inputCls = 'w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent'
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function SpecialRatePage() {
   const { pricing } = usePricing()
 
-  // Migrate legacy wilkinsSpence field into specialRates if needed
   const companies: SpecialRateCompany[] = (() => {
     if (pricing.specialRates && pricing.specialRates.length > 0) return pricing.specialRates
     if (pricing.wilkinsSpence) {
@@ -40,7 +42,9 @@ export default function SpecialRatePage() {
   })()
 
   const [selectedId, setSelectedId] = useState<string>(companies[0]?.id ?? '')
+  const [mode, setMode] = useState<Mode>('reel')
   const [reelSize, setReelSize] = useState<ReelSize>(31)
+  const [customRate, setCustomRate] = useState('')
   const [sheetWidth, setSheetWidth] = useState('')
   const [sheetHeight, setSheetHeight] = useState('')
   const [quantity, setQuantity] = useState('')
@@ -50,14 +54,15 @@ export default function SpecialRatePage() {
   const wMm = parseFloat(sheetWidth) || 0
   const hMm = parseFloat(sheetHeight) || 0
   const qty = parseInt(quantity) || 0
+  const areaSqIn = (wMm / MM_PER_INCH) * (hMm / MM_PER_INCH)
 
-  const wIn = wMm / MM_PER_INCH
-  const hIn = hMm / MM_PER_INCH
-  const areaSqIn = wIn * hIn
-  const rate = company ? getCompanyRate(company, reelSize) : 0
+  const rate = mode === 'reel'
+    ? (company ? getCompanyRate(company, reelSize) : 0)
+    : (parseFloat(customRate) || 0)
+
   const costPerUnit = areaSqIn * rate
   const total = costPerUnit * qty
-  const hasResult = wMm > 0 && hMm > 0 && qty > 0
+  const hasResult = wMm > 0 && hMm > 0 && qty > 0 && rate > 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -108,7 +113,7 @@ export default function SpecialRatePage() {
               <select
                 value={selectedId}
                 onChange={e => setSelectedId(e.target.value)}
-                className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                className={inputCls}
               >
                 {companies.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
@@ -117,32 +122,84 @@ export default function SpecialRatePage() {
             )}
           </div>
 
-          {/* ── Reel Size ── */}
+          {/* ── Mode toggle ── */}
           <div>
             <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
-              Reel Size (inches)
+              Rate Input
             </label>
-            <div className="flex gap-3">
-              {REEL_OPTIONS.map(opt => (
-                <button
-                  key={opt.value}
-                  onClick={() => setReelSize(opt.value)}
-                  className={`flex-1 py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-colors ${
-                    reelSize === opt.value
-                      ? 'border-red-700 bg-red-50 text-red-700'
-                      : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
+            <div className="inline-flex rounded-xl border border-gray-200 overflow-hidden">
+              <button
+                onClick={() => setMode('reel')}
+                className={`px-5 py-2 text-sm font-semibold transition-colors ${
+                  mode === 'reel'
+                    ? 'bg-red-700 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Reel Size
+              </button>
+              <button
+                onClick={() => setMode('custom')}
+                className={`px-5 py-2 text-sm font-semibold transition-colors border-l border-gray-200 ${
+                  mode === 'custom'
+                    ? 'bg-red-700 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                Custom Rate
+              </button>
             </div>
-            {company && (
-              <p className="text-xs text-gray-400 mt-2">
-                Rate: <span className="font-medium text-gray-600">Rs {getCompanyRate(company, reelSize).toFixed(4)}</span> per in²
-              </p>
-            )}
           </div>
+
+          {/* ── Reel size (mode = reel) ── */}
+          {mode === 'reel' && (
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                Reel Size (inches)
+              </label>
+              <div className="flex gap-3">
+                {REEL_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setReelSize(opt.value)}
+                    className={`flex-1 py-3 px-4 rounded-xl border-2 text-sm font-semibold transition-colors ${
+                      reelSize === opt.value
+                        ? 'border-red-700 bg-red-50 text-red-700'
+                        : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              {company && (
+                <p className="text-xs text-gray-400 mt-2">
+                  Rate: <span className="font-medium text-gray-600">Rs {getCompanyRate(company, reelSize).toFixed(4)}</span> per in²
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* ── Custom rate (mode = custom) ── */}
+          {mode === 'custom' && (
+            <div>
+              <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">
+                Rate (Rs per in²)
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="number"
+                  min={0}
+                  step={0.001}
+                  value={customRate}
+                  onChange={e => setCustomRate(e.target.value)}
+                  placeholder="e.g. 0.35"
+                  className={inputCls}
+                />
+                <span className="text-sm text-gray-500 whitespace-nowrap shrink-0">Rs / in²</span>
+              </div>
+            </div>
+          )}
 
           {/* ── Sheet Size ── */}
           <div>
@@ -159,7 +216,7 @@ export default function SpecialRatePage() {
                   value={sheetWidth}
                   onChange={e => setSheetWidth(e.target.value)}
                   placeholder="e.g. 200"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className={inputCls}
                 />
               </div>
               <div>
@@ -171,14 +228,16 @@ export default function SpecialRatePage() {
                   value={sheetHeight}
                   onChange={e => setSheetHeight(e.target.value)}
                   placeholder="e.g. 300"
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                  className={inputCls}
                 />
               </div>
             </div>
             {wMm > 0 && hMm > 0 && (
               <p className="text-xs text-gray-400 mt-2">
-                Area: <span className="font-medium text-gray-600">{(wMm * hMm).toLocaleString()} mm²</span>
-                {' '}= <span className="font-medium text-gray-600">{areaSqIn.toFixed(4)} in²</span>
+                Area:{' '}
+                <span className="font-medium text-gray-600">{(wMm * hMm).toLocaleString()} mm²</span>
+                {' '}={' '}
+                <span className="font-medium text-gray-600">{areaSqIn.toFixed(4)} in²</span>
               </p>
             )}
           </div>
@@ -195,18 +254,20 @@ export default function SpecialRatePage() {
               value={quantity}
               onChange={e => setQuantity(e.target.value)}
               placeholder="e.g. 1000"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+              className={inputCls}
             />
           </div>
 
           {/* ── Result ── */}
-          {hasResult && company ? (
+          {hasResult ? (
             <div className="bg-gray-50 rounded-xl border border-gray-200 p-5 space-y-2">
               <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Cost Breakdown</h3>
-              <div className="flex justify-between text-sm text-gray-600">
-                <span>Company</span>
-                <span className="font-medium">{company.name}</span>
-              </div>
+              {company && (
+                <div className="flex justify-between text-sm text-gray-600">
+                  <span>Company</span>
+                  <span className="font-medium">{company.name}</span>
+                </div>
+              )}
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Sheet dimensions</span>
                 <span className="font-medium">{wMm} × {hMm} mm</span>
@@ -216,7 +277,9 @@ export default function SpecialRatePage() {
                 <span className="font-medium">{areaSqIn.toFixed(4)} in²</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
-                <span>Rate ({reelSize}" reel)</span>
+                <span>
+                  {mode === 'reel' ? `Rate (${reelSize}" reel)` : 'Rate (custom)'}
+                </span>
                 <span className="font-medium">Rs {rate.toFixed(4)} / in²</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
@@ -235,7 +298,9 @@ export default function SpecialRatePage() {
             </div>
           ) : (
             <div className="rounded-xl border-2 border-dashed border-gray-200 p-8 text-center text-gray-400 text-sm">
-              Select a company, reel size, sheet dimensions, and quantity to see the quote.
+              {mode === 'reel'
+                ? 'Select a company, reel size, sheet dimensions, and quantity to see the quote.'
+                : 'Enter a rate, sheet dimensions, and quantity to see the quote.'}
             </div>
           )}
 
