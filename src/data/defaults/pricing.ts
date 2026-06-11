@@ -32,12 +32,9 @@ export const defaultPricing: PricingConfig = {
     ssclPercentage: 2.125,
     vatPercentage:  18,
   },
-  wilkinsSpence: {
-    reel31: 0.30,   // Rs per in² — adjust in admin
-    reel35: 0.35,
-    reel37: 0.38,
-    reel39: 0.42,
-  },
+  specialRates: [
+    { id: 'wilkins-spence', name: 'Wilkins Spence', reel31: 0.30, reel35: 0.35, reel37: 0.38, reel39: 0.42 },
+  ],
   company: {
     companyName:  'Pack Me Lanka',
     legalName:    'Pack Me Lanka (PVT) LTD',

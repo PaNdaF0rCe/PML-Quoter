@@ -4,7 +4,7 @@ import { useAuth } from '../context/AuthContext'
 const logo = '/logo.webp'
 import { usePricing } from '../context/PricingContext'
 import { defaultPricing } from '../data/defaults/pricing'
-import type { PricingConfig, WilkinsSpenceRates } from '../lib/pricingTypes'
+import type { PricingConfig, SpecialRateCompany } from '../lib/pricingTypes'
 import Button from '../components/ui/Button'
 import Input from '../components/ui/Input'
 import SeedButton from '../components/admin/SeedButton'
@@ -126,9 +126,37 @@ export default function AdminDashboardPage() {
   const setCompany = (key: keyof typeof local.company, v: string) =>
     setLocal(p => ({ ...p, company: { ...p.company, [key]: v } }))
 
-  const defaultWS = defaultPricing.wilkinsSpence!
-  const setWS = (key: keyof WilkinsSpenceRates, v: number) =>
-    setLocal(p => ({ ...p, wilkinsSpence: { ...(p.wilkinsSpence ?? defaultWS), [key]: v } }))
+  // ── Special rate companies ──
+  const defaultCompanies = defaultPricing.specialRates!
+
+  // Migrate legacy wilkinsSpence into specialRates on first admin load
+  const specialRates: SpecialRateCompany[] = (() => {
+    if (local.specialRates && local.specialRates.length > 0) return local.specialRates
+    if (local.wilkinsSpence) {
+      return [{ id: 'wilkins-spence', name: 'Wilkins Spence', ...local.wilkinsSpence }]
+    }
+    return defaultCompanies
+  })()
+
+  const setSpecialRates = (companies: SpecialRateCompany[]) =>
+    setLocal(p => ({ ...p, specialRates: companies }))
+
+  const updateCompany = (id: string, key: keyof SpecialRateCompany, value: string | number) =>
+    setSpecialRates(specialRates.map(c => c.id === id ? { ...c, [key]: value } : c))
+
+  const removeCompany = (id: string) =>
+    setSpecialRates(specialRates.filter(c => c.id !== id))
+
+  const [newCompanyName, setNewCompanyName] = useState('')
+  const [newRates, setNewRates] = useState({ reel31: 0, reel35: 0, reel37: 0, reel39: 0 })
+
+  const addCompany = () => {
+    if (!newCompanyName.trim()) return
+    const id = newCompanyName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+    setSpecialRates([...specialRates, { id, name: newCompanyName.trim(), ...newRates }])
+    setNewCompanyName('')
+    setNewRates({ reel31: 0, reel35: 0, reel37: 0, reel39: 0 })
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -344,40 +372,66 @@ export default function AdminDashboardPage() {
           </div>
         </SectionCard>
 
-        {/* ── 6. Wilkins Spence Rates ── */}
-        <SectionCard title="Wilkins Spence — Reel Rates (Rs per in²)">
-          <p className="text-sm text-gray-500 mb-4">
-            Rates applied per square inch of sheet area for each reel size. Sheet dimensions are entered in mm and converted automatically.
+        {/* ── 6. Special Rate Companies ── */}
+        <SectionCard title="Special Rate Companies (Rs per in²)">
+          <p className="text-sm text-gray-500 mb-5">
+            Per-company reel rates for the Special Rate Quotation. Sheet dimensions are entered in mm and converted to in² automatically.
           </p>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <RateField
-              label='31" Reel'
-              hint="Rs per in²"
-              step={0.001}
-              value={local.wilkinsSpence?.reel31 ?? defaultWS.reel31}
-              onChange={v => setWS('reel31', v)}
-            />
-            <RateField
-              label='35" Reel'
-              hint="Rs per in²"
-              step={0.001}
-              value={local.wilkinsSpence?.reel35 ?? defaultWS.reel35}
-              onChange={v => setWS('reel35', v)}
-            />
-            <RateField
-              label='37" Reel'
-              hint="Rs per in²"
-              step={0.001}
-              value={local.wilkinsSpence?.reel37 ?? defaultWS.reel37}
-              onChange={v => setWS('reel37', v)}
-            />
-            <RateField
-              label='39" Reel'
-              hint="Rs per in²"
-              step={0.001}
-              value={local.wilkinsSpence?.reel39 ?? defaultWS.reel39}
-              onChange={v => setWS('reel39', v)}
-            />
+
+          {/* Existing companies */}
+          <div className="space-y-5">
+            {specialRates.map(c => (
+              <div key={c.id} className="border border-gray-200 rounded-xl p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <input
+                    type="text"
+                    value={c.name}
+                    onChange={e => updateCompany(c.id, 'name', e.target.value)}
+                    className="text-sm font-semibold text-gray-800 border-0 border-b border-transparent hover:border-gray-300 focus:border-red-500 focus:outline-none bg-transparent w-full max-w-xs py-0.5"
+                  />
+                  <button
+                    onClick={() => removeCompany(c.id)}
+                    className="ml-3 text-xs text-gray-400 hover:text-red-600 transition-colors shrink-0"
+                    title="Remove company"
+                  >
+                    Remove
+                  </button>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                  <RateField label='31" Reel' hint="Rs/in²" step={0.001} value={c.reel31} onChange={v => updateCompany(c.id, 'reel31', v)} />
+                  <RateField label='35" Reel' hint="Rs/in²" step={0.001} value={c.reel35} onChange={v => updateCompany(c.id, 'reel35', v)} />
+                  <RateField label='37" Reel' hint="Rs/in²" step={0.001} value={c.reel37} onChange={v => updateCompany(c.id, 'reel37', v)} />
+                  <RateField label='39" Reel' hint="Rs/in²" step={0.001} value={c.reel39} onChange={v => updateCompany(c.id, 'reel39', v)} />
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add new company */}
+          <div className="mt-5 border-t border-gray-100 pt-5">
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Add New Company</p>
+            <div className="space-y-3">
+              <Input
+                type="text"
+                placeholder="Company name"
+                value={newCompanyName}
+                onChange={e => setNewCompanyName(e.target.value)}
+              />
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <RateField label='31" Reel' hint="Rs/in²" step={0.001} value={newRates.reel31} onChange={v => setNewRates(r => ({ ...r, reel31: v }))} />
+                <RateField label='35" Reel' hint="Rs/in²" step={0.001} value={newRates.reel35} onChange={v => setNewRates(r => ({ ...r, reel35: v }))} />
+                <RateField label='37" Reel' hint="Rs/in²" step={0.001} value={newRates.reel37} onChange={v => setNewRates(r => ({ ...r, reel37: v }))} />
+                <RateField label='39" Reel' hint="Rs/in²" step={0.001} value={newRates.reel39} onChange={v => setNewRates(r => ({ ...r, reel39: v }))} />
+              </div>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={addCompany}
+                disabled={!newCompanyName.trim()}
+              >
+                + Add Company
+              </Button>
+            </div>
           </div>
         </SectionCard>
 

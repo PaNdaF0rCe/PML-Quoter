@@ -90,10 +90,10 @@ export default function HomePage() {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => navigate('/wilkins-spence')}
+              onClick={() => navigate('/special-rate')}
               className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-semibold rounded-xl hover:bg-gray-50 transition-colors shadow-sm"
             >
-              Wilkins Spence Quote
+              Special Rate Quotation
             </button>
             <button
               onClick={() => navigate('/calculator')}

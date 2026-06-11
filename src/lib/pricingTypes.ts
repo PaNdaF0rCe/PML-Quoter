@@ -55,7 +55,9 @@ export interface TaxRates {
   vatPercentage:  number   // Value Added Tax (default 18%)
 }
 
-export interface WilkinsSpenceRates {
+export interface SpecialRateCompany {
+  id: string
+  name: string
   reel31: number   // Rs per in²
   reel35: number
   reel37: number
@@ -83,7 +85,9 @@ export interface PricingConfig {
   surcharges: Surcharges
   taxes: TaxRates
   company: CompanySettings
-  wilkinsSpence?: WilkinsSpenceRates
+  specialRates?: SpecialRateCompany[]
+  /** @deprecated use specialRates */
+  wilkinsSpence?: { reel31: number; reel35: number; reel37: number; reel39: number }
 }
 
 // ─── Quote inputs ─────────────────────────────────────────────────────────────
