@@ -33,7 +33,16 @@ export const defaultPricing: PricingConfig = {
     vatPercentage:  18,
   },
   specialRates: [
-    { id: 'wilkins-spence', name: 'Wilkins Spence', rateType: 'reel' as const, reel31: 0.30, reel35: 0.35, reel37: 0.38, reel39: 0.42 },
+    {
+      id: 'wilkins-spence',
+      name: 'Wilkins Spence',
+      rates: [
+        { label: '31" Reel', rate: 0.30 },
+        { label: '35" Reel', rate: 0.35 },
+        { label: '37" Reel', rate: 0.38 },
+        { label: '39" Reel', rate: 0.42 },
+      ],
+    },
   ],
   company: {
     companyName:  'Pack Me Lanka',

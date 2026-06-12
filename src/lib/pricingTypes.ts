@@ -55,17 +55,15 @@ export interface TaxRates {
   vatPercentage:  number   // Value Added Tax (default 18%)
 }
 
+export interface SpecialRateItem {
+  label: string   // e.g. '31" Reel', 'Standard Rate'
+  rate: number    // Rs per in²
+}
+
 export interface SpecialRateCompany {
   id: string
   name: string
-  rateType: 'reel' | 'flat'
-  // reel rates — used when rateType = 'reel'
-  reel31?: number   // Rs per in²
-  reel35?: number
-  reel37?: number
-  reel39?: number
-  // flat rate — used when rateType = 'flat'
-  flatRate?: number  // Rs per in²
+  rates: SpecialRateItem[]
 }
 
 export interface CompanySettings {
