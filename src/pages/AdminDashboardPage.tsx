@@ -14,10 +14,10 @@ import SeedButton from '../components/admin/SeedButton'
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
+      <div className="px-4 sm:px-6 py-4 border-b border-gray-100 bg-gray-50">
         <h3 className="text-sm font-semibold text-gray-700 uppercase tracking-wide">{title}</h3>
       </div>
-      <div className="px-6 py-5">{children}</div>
+      <div className="px-4 sm:px-6 py-5">{children}</div>
     </div>
   )
 }
@@ -154,13 +154,26 @@ export default function AdminDashboardPage() {
   const removeNewRateRow = (i: number) =>
     setNewCompanyRates(r => r.filter((_, idx) => idx !== i))
 
-  const addCompany = () => {
+  const addCompany = async () => {
     if (!newCompanyName.trim()) return
     const id = newCompanyName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
     const rates = newCompanyRates.filter(r => r.label.trim())
-    setSpecialRates([...specialRates, { id, name: newCompanyName.trim(), rates }])
+    const newCompanies = [...specialRates, { id, name: newCompanyName.trim(), rates }]
+    const newLocal = { ...local, specialRates: newCompanies }
+    setLocal(newLocal)
     setNewCompanyName('')
     setNewCompanyRates([{ label: '', rate: 0 }])
+    setSaving(true)
+    setSavedMsg('')
+    try {
+      await update(newLocal)
+      setSavedMsg('Company added and saved.')
+    } catch {
+      setSavedMsg('Added locally — click Save Changes to persist.')
+    } finally {
+      setSaving(false)
+      setTimeout(() => setSavedMsg(''), 3000)
+    }
   }
 
   return (
@@ -388,44 +401,46 @@ export default function AdminDashboardPage() {
             {specialRates.map(c => (
               <div key={c.id} className="border border-gray-200 rounded-xl p-4">
                 {/* Name + remove company */}
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2 mb-4">
                   <input
                     type="text"
                     value={c.name}
                     onChange={e => updateCompanyName(c.id, e.target.value)}
-                    className="text-sm font-semibold text-gray-800 border-0 border-b border-transparent hover:border-gray-300 focus:border-red-500 focus:outline-none bg-transparent w-full max-w-xs py-0.5"
+                    className="flex-1 text-sm font-semibold text-gray-800 border-0 border-b border-transparent hover:border-gray-300 focus:border-red-500 focus:outline-none bg-transparent py-0.5 min-w-0"
                   />
-                  <button onClick={() => removeCompany(c.id)} className="ml-3 text-xs text-gray-400 hover:text-red-600 transition-colors shrink-0">
-                    Remove company
+                  <button onClick={() => removeCompany(c.id)} className="shrink-0 p-1 text-gray-300 hover:text-red-500 transition-colors text-lg leading-none" title="Remove company">
+                    ×
                   </button>
                 </div>
                 {/* Rate rows */}
                 <div className="space-y-2">
                   {c.rates.map((r, i) => (
-                    <div key={i} className="flex items-center gap-2">
+                    <div key={i} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
                       <input
                         type="text"
                         value={r.label}
                         onChange={e => updateCompanyRates(c.id, c.rates.map((row, idx) => idx === i ? { ...row, label: e.target.value } : row))}
                         placeholder='e.g. 31" Reel'
-                        className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                       />
-                      <input
-                        type="number"
-                        min={0}
-                        step={0.001}
-                        value={r.rate}
-                        onChange={e => updateCompanyRates(c.id, c.rates.map((row, idx) => idx === i ? { ...row, rate: Number(e.target.value) } : row))}
-                        className="w-28 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                      />
-                      <span className="text-xs text-gray-400 whitespace-nowrap">Rs/in²</span>
-                      <button
-                        onClick={() => updateCompanyRates(c.id, c.rates.filter((_, idx) => idx !== i))}
-                        className="text-gray-300 hover:text-red-500 transition-colors text-lg leading-none"
-                        title="Remove rate"
-                      >
-                        ×
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={0}
+                          step={0.001}
+                          value={r.rate}
+                          onChange={e => updateCompanyRates(c.id, c.rates.map((row, idx) => idx === i ? { ...row, rate: Number(e.target.value) } : row))}
+                          className="flex-1 sm:w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                        />
+                        <span className="text-xs text-gray-400 whitespace-nowrap">Rs/in²</span>
+                        <button
+                          onClick={() => updateCompanyRates(c.id, c.rates.filter((_, idx) => idx !== i))}
+                          className="text-gray-300 hover:text-red-500 transition-colors text-lg leading-none shrink-0"
+                          title="Remove rate"
+                        >
+                          ×
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -451,26 +466,28 @@ export default function AdminDashboardPage() {
               />
               <div className="space-y-2">
                 {newCompanyRates.map((r, i) => (
-                  <div key={i} className="flex items-center gap-2">
+                  <div key={i} className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-2">
                     <input
                       type="text"
                       value={r.label}
                       onChange={e => updateNewRate(i, 'label', e.target.value)}
                       placeholder='e.g. 31" Reel'
-                      className="flex-1 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                     />
-                    <input
-                      type="number"
-                      min={0}
-                      step={0.001}
-                      value={r.rate}
-                      onChange={e => updateNewRate(i, 'rate', Number(e.target.value))}
-                      className="w-28 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                    />
-                    <span className="text-xs text-gray-400 whitespace-nowrap">Rs/in²</span>
-                    {newCompanyRates.length > 1 && (
-                      <button onClick={() => removeNewRateRow(i)} className="text-gray-300 hover:text-red-500 transition-colors text-lg leading-none" title="Remove">×</button>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="number"
+                        min={0}
+                        step={0.001}
+                        value={r.rate}
+                        onChange={e => updateNewRate(i, 'rate', Number(e.target.value))}
+                        className="flex-1 sm:w-24 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                      />
+                      <span className="text-xs text-gray-400 whitespace-nowrap">Rs/in²</span>
+                      {newCompanyRates.length > 1 && (
+                        <button onClick={() => removeNewRateRow(i)} className="text-gray-300 hover:text-red-500 transition-colors text-lg leading-none shrink-0" title="Remove">×</button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
