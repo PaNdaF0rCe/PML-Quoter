@@ -157,7 +157,7 @@ export default function AdminDashboardPage() {
   const addCompany = async () => {
     if (!newCompanyName.trim()) return
     const id = newCompanyName.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-    const rates = newCompanyRates.filter(r => r.label.trim())
+    const rates = newCompanyRates
     const newCompanies = [...specialRates, { id, name: newCompanyName.trim(), rates }]
     const newLocal = { ...local, specialRates: newCompanies }
     setLocal(newLocal)
