@@ -6,7 +6,15 @@ import type { SpecialRateCompany } from '../lib/pricingTypes'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
-const MM_PER_INCH = 25.4
+type DimUnit = 'mm' | 'cm' | 'in'
+
+const UNIT_LABELS: Record<DimUnit, string> = { mm: 'mm', cm: 'cm', in: 'in' }
+
+function toInches(value: number, unit: DimUnit): number {
+  if (unit === 'in') return value
+  if (unit === 'cm') return value / 2.54
+  return value / 25.4   // mm
+}
 
 function fmtRs(n: number) {
   return 'Rs ' + n.toLocaleString('en-LK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -49,6 +57,7 @@ export default function SpecialRatePage() {
 
   const [selectedId, setSelectedId] = useState<string>(companies[0]?.id ?? '')
   const [selectedRateIdx, setSelectedRateIdx] = useState(0)
+  const [unit, setUnit] = useState<DimUnit>('mm')
   const [sheetWidth, setSheetWidth] = useState('')
   const [sheetHeight, setSheetHeight] = useState('')
   const [quantity, setQuantity] = useState('')
@@ -64,14 +73,16 @@ export default function SpecialRatePage() {
   const safeIdx = Math.min(selectedRateIdx, (company?.rates.length ?? 1) - 1)
   const selectedRate = company?.rates[safeIdx]
 
-  const wMm = parseFloat(sheetWidth) || 0
-  const hMm = parseFloat(sheetHeight) || 0
+  const w = parseFloat(sheetWidth) || 0
+  const h = parseFloat(sheetHeight) || 0
   const qty = parseInt(quantity) || 0
-  const areaSqIn = (wMm / MM_PER_INCH) * (hMm / MM_PER_INCH)
+  const wIn = toInches(w, unit)
+  const hIn = toInches(h, unit)
+  const areaSqIn = wIn * hIn
   const rate = selectedRate?.rate ?? 0
   const costPerUnit = areaSqIn * rate
   const total = costPerUnit * qty
-  const hasResult = wMm > 0 && hMm > 0 && qty > 0 && rate > 0
+  const hasResult = w > 0 && h > 0 && qty > 0 && rate > 0
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -146,22 +157,40 @@ export default function SpecialRatePage() {
 
           {/* ── Sheet Size ── */}
           <div>
-            <label className="block text-xs font-semibold text-gray-600 uppercase tracking-wide mb-2">Sheet Size (mm)</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="text-xs font-semibold text-gray-600 uppercase tracking-wide">Sheet Size</label>
+              {/* Unit toggle */}
+              <div className="inline-flex rounded-lg border border-gray-200 overflow-hidden">
+                {(['mm', 'cm', 'in'] as DimUnit[]).map(u => (
+                  <button
+                    key={u}
+                    onClick={() => setUnit(u)}
+                    className={`px-3 py-1 text-xs font-semibold transition-colors ${
+                      unit === u
+                        ? 'bg-red-700 text-white'
+                        : 'bg-white text-gray-500 hover:bg-gray-50'
+                    }`}
+                  >
+                    {UNIT_LABELS[u]}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Width (mm)</label>
+                <label className="block text-xs text-gray-500 mb-1">Width ({unit})</label>
                 <input type="number" min={0} step={0.1} value={sheetWidth}
                   onChange={e => setSheetWidth(e.target.value)} placeholder="e.g. 200" className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-gray-500 mb-1">Height (mm)</label>
+                <label className="block text-xs text-gray-500 mb-1">Height ({unit})</label>
                 <input type="number" min={0} step={0.1} value={sheetHeight}
                   onChange={e => setSheetHeight(e.target.value)} placeholder="e.g. 300" className={inputCls} />
               </div>
             </div>
-            {wMm > 0 && hMm > 0 && (
+            {w > 0 && h > 0 && (
               <p className="text-xs text-gray-400 mt-2">
-                Area: <span className="font-medium text-gray-600">{(wMm * hMm).toLocaleString()} mm²</span>
+                Area: <span className="font-medium text-gray-600">{w} × {h} {unit}</span>
                 {' '}= <span className="font-medium text-gray-600">{areaSqIn.toFixed(4)} in²</span>
               </p>
             )}
@@ -184,7 +213,7 @@ export default function SpecialRatePage() {
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Sheet dimensions</span>
-                <span className="font-medium">{wMm} × {hMm} mm</span>
+                <span className="font-medium">{w} × {h} {unit}</span>
               </div>
               <div className="flex justify-between text-sm text-gray-600">
                 <span>Sheet area</span>
